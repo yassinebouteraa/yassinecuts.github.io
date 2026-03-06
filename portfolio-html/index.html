@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Editor Portfolio</title>
+    <meta name="description"
+        content="A dynamic and interactive portfolio showcasing cinematic video editing, color grading, and visual effects." />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Lucide Icons Library directly from CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="admin-mode">
+
+    <!-- HEADER -->
+    <header class="glass-panel" style="position: sticky; top: 1rem; z-index: 50; margin: 1rem; padding: 1rem 2rem;">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 0;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <i data-lucide="play-square" style="color: var(--primary-color); width: 32px; height: 32px;"></i>
+                <h1 style="font-size: 1.5rem; font-weight: 700;">
+                    Editor<span class="text-gradient">Pro</span>
+                </h1>
+            </div>
+
+            <nav style="display: flex; align-items: center; gap: 2rem;">
+                <a href="#" style="color: var(--text-main); font-weight: 500; text-decoration: none;"
+                    class="nav-link">Portfolio</a>
+                <a href="#testimonials" style="color: var(--text-muted); font-weight: 500; text-decoration: none;"
+                    class="nav-link">Testimonials</a>
+                <a href="#contact" style="color: var(--text-muted); font-weight: 500; text-decoration: none;"
+                    class="nav-link">Contact</a>
+
+                <button id="adminToggleBtn"
+                    style="display: flex; align-items: center; gap: 0.25rem; color: var(--accent-color); opacity: 0.7;"
+                    title="Toggle Admin View">
+                    <i id="adminToggleIcon" data-lucide="unlock" style="width: 14px; height: 14px;"></i>
+                    <span style="font-size: 0.8rem;">Admin</span>
+                </button>
+
+                <button class="btn-primary admin-only" onclick="openModal('uploadVideoModal')">
+                    <i data-lucide="plus" style="width: 20px; height: 20px;"></i>
+                    <span>Add Video</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO SECTION -->
+        <section class="container" style="padding-top: 6rem; padding-bottom: 4rem; text-align: center;">
+            <div class="animate-fade-in">
+                <div
+                    style="display: inline-block; padding: 0.5rem 1rem; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 99px; color: var(--primary-color); font-weight: 600; font-size: 0.875rem; margin-bottom: 1.5rem;">
+                    Freelance Video Editor & Motion Designer
+                </div>
+
+                <h2
+                    style="font-size: 4rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -1px;">
+                    Crafting visual stories that <br />
+                    <span class="text-gradient">captivate and inspire.</span>
+                </h2>
+
+                <p style="font-size: 1.25rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 2.5rem;">
+                    Showcasing my best work in cinematic editing, color grading, and visual effects. Welcome to my
+                    creative portfolio.
+                </p>
+
+                <div style="display: flex; gap: 1rem; justify-content: center; align-items: center;">
+                    <button class="btn-primary admin-only" style="padding: 1rem 2rem; font-size: 1.1rem;"
+                        onclick="openModal('uploadVideoModal')">
+                        <i data-lucide="upload-cloud" style="width: 24px; height: 24px;"></i>
+                        <span>Upload New Work</span>
+                    </button>
+
+                    <button
+                        style="display: flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; font-weight: 600; font-size: 1.1rem; color: var(--text-main); border-bottom: 2px solid transparent; transition: border-color 0.2s;"
+                        onmouseenter="this.style.borderColor='var(--text-main)'"
+                        onmouseleave="this.style.borderColor='transparent'">
+                        <span>View Showreel</span>
+                        <i data-lucide="arrow-right" style="width: 20px; height: 20px;"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIDEOS GALLERY -->
+        <section class="container" style="padding-bottom: 6rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="font-size: 2rem; font-weight: 700;">Featured <span class="text-gradient">Edits</span></h3>
+                <p style="color: var(--text-muted);"><span id="videoCountText">0</span> items</p>
+            </div>
+
+            <div id="videoGridContainer" class="video-grid">
+                <!-- Videos will be injected here via JS -->
+            </div>
+
+            <div id="emptyVideoState" class="glass-panel" style="padding: 4rem; text-align: center; display: none;">
+                <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 1rem;">No videos added yet.</p>
+                <p class="admin-only">Click "Add Video" to start building your portfolio!</p>
+            </div>
+        </section>
+
+        <!-- TESTIMONIALS GALLERY -->
+        <section id="testimonials" class="container" style="padding-bottom: 6rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="font-size: 2rem; font-weight: 700;">Client <span class="text-gradient">Review
+                        Screenshots</span></h3>
+
+                <button class="btn-primary admin-only" style="padding: 0.5rem 1rem; font-size: 0.9rem;"
+                    onclick="openModal('uploadImageModal')">
+                    <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                    <span>Add Screenshot</span>
+                </button>
+            </div>
+
+            <div id="testimonialGridContainer" class="video-grid">
+                <!-- Testimonials will be injected here via JS -->
+            </div>
+
+            <div id="emptyTestimonialState" class="glass-panel"
+                style="padding: 4rem; text-align: center; display: none;">
+                <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 1rem;">No testimonials added yet.
+                </p>
+                <p class="admin-only">Click "Add Screenshot" to showcase your client feedback!</p>
+            </div>
+        </section>
+
+        <!-- CONTACT INFO -->
+        <section id="contact" class="container" style="padding-bottom: 6rem; padding-top: 2rem;">
+            <div class="glass-panel animate-fade-in"
+                style="padding: 4rem 2rem; display: flex; flex-direction: column; align-items: center; text-align: center; background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%); position: relative; overflow: hidden;">
+
+                <!-- Background glow -->
+                <div
+                    style="position: absolute; top: -50%; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 60%); z-index: 0; pointer-events: none;">
+                </div>
+
+                <div style="z-index: 1; position: relative;">
+                    <!-- Avatar -->
+                    <div
+                        style="width: 180px; height: 180px; border-radius: 50%; background: var(--surface-color); border: 3px solid var(--primary-color); overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(99, 102, 241, 0.4); margin: 0 auto 1.5rem; position: relative;">
+                        <!-- Profile Image -->
+                        <img src="./profile.jpg" alt="Yassine Bouteraa"
+                            style="width: 100%; height: 100%; object-fit: cover;"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                        <!-- Fallback Initials -->
+                        <div
+                            style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); display: none; align-items: center; justify-content: center; font-size: 4rem; font-weight: bold; color: white; position: absolute; top: 0; left: 0;">
+                            YB
+                        </div>
+                    </div>
+
+                    <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;">
+                        Yassine <span class="text-gradient">Bouteraa</span>
+                    </h2>
+
+                    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 500px; margin: 0 auto 2.5rem;">
+                        Ready to make your next video go viral? Let's collaborate. Reach out to me directly below.
+                    </p>
+
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <!-- Phone Pill -->
+                        <a href="tel:+21658526615" class="glass-panel"
+                            style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; color: var(--text-main); text-decoration: none; transition: all 0.3s ease; border-radius: 99px;"
+                            onmouseenter="this.style.transform='translateY(-3px)'; this.style.borderColor='var(--primary-color)';"
+                            onmouseleave="this.style.transform='translateY(0)'; this.style.borderColor='var(--surface-border)';">
+                            <i data-lucide="phone" style="color: var(--primary-color); width: 20px; height: 20px;"></i>
+                            <span style="font-weight: 600;">+216 58 526 615</span>
+                        </a>
+
+                        <!-- WhatsApp Pill -->
+                        <a href="https://wa.me/21658526615" target="_blank" rel="noopener noreferrer"
+                            class="glass-panel"
+                            style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; color: var(--text-main); text-decoration: none; transition: all 0.3s ease; border-radius: 99px;"
+                            onmouseenter="this.style.transform='translateY(-3px)'; this.style.borderColor='#25D366';"
+                            onmouseleave="this.style.transform='translateY(0)'; this.style.borderColor='var(--surface-border)';">
+                            <i data-lucide="message-circle" style="color: #25D366; width: 20px; height: 20px;"></i>
+                            <span style="font-weight: 600;">WhatsApp</span>
+                        </a>
+
+                        <!-- Instagram Pill -->
+                        <a href="https://instagram.com/yassine_bouteraa" target="_blank" rel="noopener noreferrer"
+                            class="glass-panel"
+                            style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; color: var(--text-main); text-decoration: none; transition: all 0.3s ease; border-radius: 99px;"
+                            onmouseenter="this.style.transform='translateY(-3px)'; this.style.borderColor='var(--accent-color)';"
+                            onmouseleave="this.style.transform='translateY(0)'; this.style.borderColor='var(--surface-border)';">
+                            <i data-lucide="instagram"
+                                style="color: var(--accent-color); width: 20px; height: 20px;"></i>
+                            <span style="font-weight: 600;">@yassine_bouteraa</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODALS -->
+
+    <!-- Upload Video Modal -->
+    <div id="uploadVideoModal" class="modal-overlay" onclick="closeModals(event)">
+        <div class="glass-panel modal-content" onclick="event.stopPropagation()">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="film" class="text-gradient"></i> Add New Video
+                </h2>
+                <button class="btn-icon" onclick="closeModal('uploadVideoModal')">
+                    <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+                </button>
+            </div>
+
+            <form id="videoUploadForm" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <div id="videoDropzone"
+                    style="border: 2px dashed var(--surface-border); border-radius: 12px; padding: 3rem 2rem; text-align: center; background-color: rgba(255, 255, 255, 0.02); transition: all 0.2s ease; cursor: pointer;">
+                    <input type="file" id="videoFileInput" accept="video/*" style="display: none;"
+                        onchange="handleVideoFileSelect(event)">
+
+                    <div id="videoUploadPrompt"
+                        style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                        <i data-lucide="upload" style="color: var(--text-muted); width: 48px; height: 48px;"></i>
+                        <div>
+                            <p style="font-weight: 600; color: var(--text-main);">Click to upload video</p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">MP4, WebM or OGG</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label
+                        style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted);">Project
+                        Title *</label>
+                    <input type="text" id="videoTitleInput" placeholder="e.g. Cinematic Showreel 2024" required>
+                </div>
+
+                <div>
+                    <label
+                        style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted);">Description</label>
+                    <textarea id="videoDescInput" placeholder="Briefly describe the edit..." rows="3"></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary"
+                    style="width: 100%; justify-content: center; margin-top: 1rem;">
+                    Add to Portfolio
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Upload Image Modal -->
+    <div id="uploadImageModal" class="modal-overlay" onclick="closeModals(event)">
+        <div class="glass-panel modal-content" onclick="event.stopPropagation()">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="image" class="text-gradient"></i> Add Screenshot
+                </h2>
+                <button class="btn-icon" onclick="closeModal('uploadImageModal')">
+                    <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+                </button>
+            </div>
+
+            <form id="imageUploadForm" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <div id="imageDropzone"
+                    style="border: 2px dashed var(--surface-border); border-radius: 12px; padding: 3rem 2rem; text-align: center; background-color: rgba(255, 255, 255, 0.02); transition: all 0.2s ease; cursor: pointer;">
+                    <input type="file" id="imageFileInput" accept="image/*" style="display: none;"
+                        onchange="handleImageFileSelect(event)">
+
+                    <div id="imageUploadPrompt"
+                        style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                        <i data-lucide="upload" style="color: var(--text-muted); width: 48px; height: 48px;"></i>
+                        <div>
+                            <p style="font-weight: 600; color: var(--text-main);">Click to upload screenshot</p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">PNG, JPG or WebP</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary"
+                    style="width: 100%; justify-content: center; margin-top: 1rem;">
+                    Add to Testimonials
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script Application Logic -->
+    <script src="app.js"></script>
+    <script>
+        // Initialize lucide icons on load
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
