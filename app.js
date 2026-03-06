@@ -1,6 +1,6 @@
 // Simple State Object to hold data
 let state = {
-    isAdmin: true,
+    isAdmin: false, // Default to FALSE so visitors don't see admin controls
     videos: [
         {
             id: '1',
@@ -51,7 +51,38 @@ document.addEventListener("DOMContentLoaded", () => {
 // ===================
 // ADMIN TOGGLE LOGIC
 // ===================
-function toggleAdmin() {
+async function hashString(str) {
+    const msgBuffer = new TextEncoder().encode(str);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function toggleAdmin() {
+    // If trying to turn admin mode ON, ask for password
+    if (!state.isAdmin) {
+        const password = prompt("Enter Admin Password:");
+
+        if (!password) return; // User canceled
+
+        try {
+            // Hash the password they entered using SHA-256
+            const hashedInput = await hashString(password);
+
+            // This is the one-way hash for your new password, so your password is NOT stored in plaintext!
+            const correctHash = "84a0693000844831479dbbf1e528739980aa243e53aa2e08fe2a65a420bd64ff";
+
+            if (hashedInput !== correctHash) {
+                alert("Incorrect password.");
+                return;
+            }
+        } catch (e) {
+            console.error("Encryption check failed:", e);
+            alert("Security check failed. You must access this site over HTTPS.");
+            return;
+        }
+    }
+
     state.isAdmin = !state.isAdmin;
 
     const bodyObj = document.body;
