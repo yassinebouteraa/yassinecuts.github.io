@@ -21,7 +21,26 @@ let state = {
             videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4'
         }
     ],
-    testimonials: [],
+    testimonials: [
+        {
+            id: 't1',
+            type: 'text',
+            name: 'Alex R. - YouTuber',
+            text: 'Finding Yassine was a gamechanger. He completely revamped my editing style and within a week, my latest video hit 2 million views. It literally printed money for my channel and grew my subs like crazy!'
+        },
+        {
+            id: 't2',
+            type: 'text',
+            name: 'Sarah M. - Instagram Creator',
+            text: 'I was struggling to get any traction on Reels until Yassine took over. The cinematic quality and fast-paced hooks made my content go viral instantly. Best editor out there!'
+        },
+        {
+            id: 't3',
+            type: 'text',
+            name: 'David K. - Entrepreneur',
+            text: 'The ads Yassine cuts for us are printing money. The hooks are aggressive, the color grading is top-tier, and our conversion rate is through the roof. Hiring him is a no-brainer.'
+        }
+    ],
 
     // Upload pointers
     pendingVideoFile: null,
@@ -32,12 +51,12 @@ let state = {
 // INITIALIZATION
 // ===================
 document.addEventListener("DOMContentLoaded", () => {
-    // Admin Toggle Listener
-    document.getElementById('adminToggleBtn').addEventListener('click', toggleAdmin);
+    // Admin Toggle Listener (moved to logo Easter Egg)
 
     // Upload Forms Listeners
     document.getElementById('videoUploadForm').addEventListener('submit', submitVideoUpload);
     document.getElementById('imageUploadForm').addEventListener('submit', submitImageUpload);
+    document.getElementById('leaveReviewForm').addEventListener('submit', submitTextTestimonial);
 
     // Dropzone click listeners
     document.getElementById('videoDropzone').addEventListener('click', () => document.getElementById('videoFileInput').click());
@@ -45,7 +64,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Initial render
     renderApp();
+    initStatCounters(); // Start up the stats animation logic
 });
+
+// ===================
+// ANIMATIONS
+// ===================
+function initStatCounters() {
+    const statsBar = document.getElementById('statsBar');
+    if (!statsBar) return;
+
+    // Intersection Observer to start counting when visible
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+            const counters = document.querySelectorAll('.stat-counter');
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-target'));
+                const duration = 2000; // 2 seconds
+
+                let startTimestamp = null;
+                const updateCounter = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+
+                    // Easing animation (easeOutQuart for cinematic slow down at the end)
+                    const easeOutProgress = 1 - Math.pow(1 - progress, 4);
+
+                    const current = Math.floor(easeOutProgress * target);
+                    counter.innerText = current;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+
+                requestAnimationFrame(updateCounter);
+            });
+            // Stop observing once animated
+            observer.disconnect();
+        }
+    }, { threshold: 0.1 });
+
+    observer.observe(statsBar);
+}
 
 
 // ===================
@@ -86,17 +149,11 @@ async function toggleAdmin() {
     state.isAdmin = !state.isAdmin;
 
     const bodyObj = document.body;
-    const adminToggleIcon = document.getElementById('adminToggleIcon');
-    const adminToggleBtn = document.getElementById('adminToggleBtn');
 
     if (state.isAdmin) {
         bodyObj.classList.add('admin-mode');
-        adminToggleBtn.style.color = "var(--accent-color)";
-        adminToggleIcon.setAttribute("data-lucide", "unlock");
     } else {
         bodyObj.classList.remove('admin-mode');
-        adminToggleBtn.style.color = "var(--text-muted)";
-        adminToggleIcon.setAttribute("data-lucide", "lock");
     }
 
     // Force lucide to re-render the replaced icon
@@ -191,9 +248,34 @@ function renderTestimonials() {
             </button>
         </div>` : '';
 
+        let cardContent = '';
+        if (testimonial.type === 'text') {
+            cardContent = `
+            <div style="padding: 2.5rem; position: relative; height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="display: flex; gap: 0.25rem; color: #fbbf24; margin-bottom: 1.5rem;">
+                        <i data-lucide="star" fill="currentColor" style="width: 20px; height: 20px;"></i>
+                        <i data-lucide="star" fill="currentColor" style="width: 20px; height: 20px;"></i>
+                        <i data-lucide="star" fill="currentColor" style="width: 20px; height: 20px;"></i>
+                        <i data-lucide="star" fill="currentColor" style="width: 20px; height: 20px;"></i>
+                        <i data-lucide="star" fill="currentColor" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    <p style="font-size: 1.15rem; color: var(--text-main); margin-bottom: 2rem; line-height: 1.6; font-style: italic;">
+                        "${testimonial.text}"
+                    </p>
+                </div>
+                <p style="font-weight: 700; color: var(--text-muted); font-size: 0.95rem; letter-spacing: 0.5px;">
+                    <span class="text-gradient" style="font-size: 1.1rem;">${testimonial.name?.split(' - ')[0] || testimonial.name}</span> - ${testimonial.name?.split(' - ')[1] || ''}
+                </p>
+            </div>
+            `;
+        } else {
+            cardContent = `<img src="${testimonial.imageUrl}" alt="Client Testimonial" class="testimonial-img" />`;
+        }
+
         const cardHTML = `
-        <div class="video-card animate-fade-in" style="cursor: pointer; position: relative; overflow: hidden;">
-            <img src="${testimonial.imageUrl}" alt="Client Testimonial" class="testimonial-img" />
+        <div class="video-card animate-fade-in" style="cursor: pointer; position: relative; overflow: hidden; height: 100%;">
+            ${cardContent}
             ${adminDeleteBtnHTML}
         </div>
         `;
@@ -369,4 +451,32 @@ function submitImageUpload(e) {
 
     closeModal('uploadImageModal');
     renderApp();
+}
+
+function submitTextTestimonial(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('reviewerNameInput').value;
+    const role = document.getElementById('reviewerRoleInput').value;
+    const text = document.getElementById('reviewerTextInput').value;
+
+    if (!name || !role || !text) return;
+
+    state.testimonials.unshift({
+        id: Date.now().toString(),
+        type: 'text',
+        name: `${name} - ${role}`,
+        text: text
+    });
+
+    // Reset Form
+    document.getElementById('leaveReviewForm').reset();
+
+    closeModal('leaveReviewModal');
+    renderApp();
+
+    // Small timeout to allow render to happen before alert
+    setTimeout(() => {
+        alert("Thank you! Your testimonial has been published.");
+    }, 100);
 }

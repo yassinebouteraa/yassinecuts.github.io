@@ -34,6 +34,22 @@ body {
         radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15), transparent 25%),
         radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15), transparent 25%);
     background-attachment: fixed;
+    background-size: 200% 200%;
+    animation: bgDrift 20s ease-in-out infinite alternate;
+}
+
+@keyframes bgDrift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 /* Utility Animations */
@@ -51,6 +67,41 @@ body {
 
 .animate-fade-in {
     animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Floating & Pulsing Animations */
+.avatar-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.pulse-glow {
+    animation: pulseGlow 4s ease-in-out infinite alternate;
+}
+
+@keyframes pulseGlow {
+    0% {
+        opacity: 0.5;
+        transform: translateX(-50%) scale(0.9);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.1);
+    }
 }
 
 /* Base Syntax */
@@ -73,7 +124,8 @@ a {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color), var(--primary-color));
+    background-size: 200% auto;
     color: white;
     padding: 0.75rem 1.75rem;
     border-radius: 9999px;
@@ -82,9 +134,11 @@ a {
     align-items: center;
     gap: 0.5rem;
     box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    transition: all 0.4s ease;
 }
 
 .btn-primary:hover {
+    background-position: right center;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
 }
