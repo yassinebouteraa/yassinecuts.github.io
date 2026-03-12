@@ -65,10 +65,8 @@ async function syncDeleteTestimonial(id) {
 // ===================
 document.addEventListener("DOMContentLoaded", () => {
     // Dropzone logic
-    const videoDropzone = document.getElementById('videoDropzone');
-    if (videoDropzone) {
-        videoDropzone.addEventListener('click', () => document.getElementById('videoFileInput').click());
-    }
+    setupDropzone('videoDropzone', 'videoFileInput', handleVideoFileSelect);
+    setupDropzone('imageDropzone', 'imageFileInput', handleImageFileSelect);
 
     // Form Listeners
     const videoUploadForm = document.getElementById('videoUploadForm');
@@ -84,6 +82,36 @@ document.addEventListener("DOMContentLoaded", () => {
     loadState();
     initStatCounters();
 });
+
+function setupDropzone(dropzoneId, inputId, handleFn) {
+    const dropzone = document.getElementById(dropzoneId);
+    const input = document.getElementById(inputId);
+    if (!dropzone || !input) return;
+
+    dropzone.addEventListener('click', () => input.click());
+
+    dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.style.borderColor = 'var(--primary-color)';
+        dropzone.style.backgroundColor = 'rgba(99, 102, 241, 0.05)';
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+        dropzone.style.borderColor = 'var(--surface-border)';
+        dropzone.style.backgroundColor = 'rgba(255, 255, 255, 0.02)';
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.style.borderColor = 'var(--surface-border)';
+        dropzone.style.backgroundColor = 'rgba(255, 255, 255, 0.02)';
+        
+        if (e.dataTransfer.files.length > 0) {
+            const mockEvent = { target: { files: e.dataTransfer.files } };
+            handleFn(mockEvent);
+        }
+    });
+}
 
 // ===================
 // ANIMATIONS
@@ -121,14 +149,47 @@ function handleVideoFileSelect(event) {
     const file = event.target.files[0];
     if (file) {
         state.pendingVideoFile = file;
-        document.getElementById('videoTitleInput').value = file.name.split('.')[0].split('_').join(' ');
+        
+        // Auto-fill title from filename
+        const cleanName = file.name.split('.')[0].replace(/[_-]/g, ' ');
+        document.getElementById('videoTitleInput').value = cleanName;
+        
         document.getElementById('videoUploadPrompt').innerHTML = `
-            <i data-lucide="check-circle" style="color: var(--primary-color); width: 48px; height: 48px;"></i>
-            <p style="font-weight: 600;">${file.name}</p>
-            <p style="font-size: 0.8rem; color: var(--text-muted);">Ready to upload to database</p>
+            <div style="background: rgba(99, 102, 241, 0.1); padding: 1rem; border-radius: 8px; width: 100%;">
+                <i data-lucide="check-circle" style="color: var(--primary-color); width: 32px; height: 32px; margin-bottom: 0.5rem;"></i>
+                <p style="font-weight: 600; font-size: 0.9rem;">${file.name}</p>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Ready to upload to database</p>
+                <button type="button" class="btn-icon" style="margin: 0.5rem auto 0; width: 30px; height: 30px;" onclick="event.stopPropagation(); state.pendingVideoFile=null; resetVideoPrompt();"><i data-lucide="x" style="width: 14px; height: 14px;"></i></button>
+            </div>
         `;
         lucide.createIcons();
     }
+}
+
+function handleImageFileSelect(event) {
+    const file = event.target.files[0];
+    if (file) {
+        state.pendingImageFile = file;
+        document.getElementById('imageUploadPrompt').innerHTML = `
+            <div style="background: rgba(236, 72, 153, 0.1); padding: 1rem; border-radius: 8px; width: 100%;">
+                <i data-lucide="check-circle" style="color: var(--accent-color); width: 32px; height: 32px; margin-bottom: 0.5rem;"></i>
+                <p style="font-weight: 600; font-size: 0.9rem;">${file.name}</p>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Screenshot selected</p>
+            </div>
+        `;
+        lucide.createIcons();
+    }
+}
+
+function resetVideoPrompt() {
+    document.getElementById('videoUploadPrompt').innerHTML = `
+        <i data-lucide="upload" style="color: var(--text-muted); width: 48px; height: 48px;"></i>
+        <div>
+            <p style="font-weight: 600; color: var(--text-main);">Click to upload video</p>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">MP4, WebM or OGG (Unlimited Size)</p>
+        </div>
+    `;
+    lucide.createIcons();
 }
 
 async function handleVideoFormSubmit(e) {
@@ -158,24 +219,22 @@ async function handleVideoFormSubmit(e) {
             const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
             const filePath = `${fileName}`;
 
-            // Hacky way to show "90%" while waiting for Supabase (which doesn't have native progress in simple JS client)
-            let prog = 0;
-            const progInterval = setInterval(() => {
-                if (prog < 90) prog += 5;
-                progressBar.style.width = prog + '%';
-                progressText.innerText = `Uploading to database... ${prog}%`;
-            }, 200);
-
             const { data, error } = await _supabase.storage
                 .from('videos')
-                .upload(filePath, file);
-
-            clearInterval(progInterval);
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: false,
+                    onUploadProgress: (progress) => {
+                        const percent = Math.round((progress.loaded / progress.total) * 100);
+                        progressBar.style.width = percent + '%';
+                        progressText.innerText = `Uploading... ${percent}%`;
+                    }
+                });
 
             if (error) throw error;
 
             progressBar.style.width = '100%';
-            progressText.innerText = `Finalizing... 100%`;
+            progressText.innerText = `Finalizing...`;
 
             const { data: { publicUrl } } = _supabase.storage.from('videos').getPublicUrl(filePath);
             await submitVideoToDB(publicUrl, title, desc);
@@ -368,16 +427,46 @@ function closeModals(e) { if (e.target.classList.contains('modal-overlay')) docu
 
 async function submitImageUpload(e) {
     e.preventDefault();
-    const file = document.getElementById('imageFileInput').files[0];
-    if (!file) return;
-    const { data: uploadData, error: uploadError } = await _supabase.storage.from('videos').upload(`testimonials/${Date.now()}-${file.name}`, file);
-    if (uploadError) { alert(uploadError.message); return; }
-    const { data: { publicUrl } } = _supabase.storage.from('videos').getPublicUrl(uploadData.path);
-    const { data, error } = await _supabase.from('testimonials').insert([{ type: 'image', image_url: publicUrl }]).select();
-    if (!error) state.testimonials.unshift(data[0]);
-    document.getElementById('imageUploadForm').reset();
-    closeModal('uploadImageModal');
-    renderApp();
+    const file = state.pendingImageFile;
+    if (!file) {
+        alert("Please select a screenshot first.");
+        return;
+    }
+    
+    try {
+        const { data: uploadData, error: uploadError } = await _supabase.storage
+            .from('videos') // Using the same bucket for simplicity, or change to 'testimonials' if configured
+            .upload(`testimonials/${Date.now()}-${file.name}`, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = _supabase.storage.from('videos').getPublicUrl(uploadData.path);
+        const { data, error } = await _supabase.from('testimonials').insert([{ type: 'image', image_url: publicUrl }]).select();
+        
+        if (error) throw error;
+
+        state.testimonials.unshift(data[0]);
+        document.getElementById('imageUploadForm').reset();
+        resetImagePrompt();
+        closeModal('uploadImageModal');
+        renderApp();
+    } catch (err) {
+        alert("Image upload failed: " + err.message);
+        console.error(err);
+    } finally {
+        state.pendingImageFile = null;
+    }
+}
+
+function resetImagePrompt() {
+    document.getElementById('imageUploadPrompt').innerHTML = `
+        <i data-lucide="upload" style="color: var(--text-muted); width: 48px; height: 48px;"></i>
+        <div>
+            <p style="font-weight: 600; color: var(--text-main);">Click to upload screenshot</p>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">PNG, JPG or WebP</p>
+        </div>
+    `;
+    lucide.createIcons();
 }
 
 async function submitTextTestimonial(e) {
