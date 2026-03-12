@@ -13,6 +13,10 @@
 
     <!-- Lucide Icons Library directly from CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Cloudinary Upload Widget -->
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -244,19 +248,19 @@
             </div>
 
             <form id="videoUploadForm" style="display: flex; flex-direction: column; gap: 1.5rem;">
-                <div id="videoDropzone"
-                    style="border: 2px dashed var(--surface-border); border-radius: 12px; padding: 3rem 2rem; text-align: center; background-color: rgba(255, 255, 255, 0.02); transition: all 0.2s ease; cursor: pointer;">
-                    <input type="file" id="videoFileInput" accept="video/*" style="display: none;"
-                        onchange="handleVideoFileSelect(event)">
+                <div>
+                    <label
+                        style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted);">Video URL (YouTube/Vimeo/Cloudinary)</label>
+                    <input type="url" id="videoUrlInput" placeholder="Paste link here...">
+                </div>
 
-                    <div id="videoUploadPrompt"
-                        style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
-                        <i data-lucide="upload" style="color: var(--text-muted); width: 48px; height: 48px;"></i>
-                        <div>
-                            <p style="font-weight: 600; color: var(--text-main);">Click to upload video</p>
-                            <p style="font-size: 0.85rem; color: var(--text-muted);">MP4, WebM or OGG</p>
-                        </div>
-                    </div>
+                <div style="text-align: center; padding: 1rem; border: 1px dashed var(--surface-border); border-radius: 12px; background: rgba(255,255,255,0.02);">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">OR upload directly to your cloud storage</p>
+                    <button type="button" class="btn-primary" id="cloudinaryUploadBtn" style="width: 100%; justify-content: center; background: #3448c5;">
+                        <i data-lucide="upload-cloud"></i>
+                        <span>Upload to Cloudinary</span>
+                    </button>
+                    <p id="cloudinaryStatus" style="font-size: 0.75rem; color: var(--primary-color); margin-top: 0.5rem; display: none;">Upload successful!</p>
                 </div>
 
                 <div>

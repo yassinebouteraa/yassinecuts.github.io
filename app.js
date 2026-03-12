@@ -1,6 +1,17 @@
+// ===================
+// CONFIGURATION
+// ===================
+const CLOUDINARY_CLOUD_NAME = 'dtxm5kfuk';
+const CLOUDINARY_UPLOAD_PRESET = 'Ai Video';
+
+// Supabase Configuration
+const SUPABASE_URL = 'https://sorjwworxlwyxtipxgcb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_AQDK0RKux_i5eTsjJSXFPw_dNDUP9xP'; // Paste your "Publishable Key" from Supabase here
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 // Simple State Object to hold data
 let state = {
-    isAdmin: false, // Default to FALSE so visitors don't see admin controls
+    isAdmin: false,
     videos: [
         {
             id: '1',
@@ -48,23 +59,82 @@ let state = {
 };
 
 // ===================
+// STORAGE LOGIC (Supabase)
+// ===================
+async function loadState() {
+    try {
+        // Fetch Videos
+        const { data: videos, error: vError } = await _supabase
+            .from('videos')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (!vError && videos) {
+            state.videos = videos;
+        }
+
+        // Fetch Testimonials
+        const { data: testimonials, error: tError } = await _supabase
+            .from('testimonials')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (!tError && testimonials) {
+            state.testimonials = testimonials;
+        }
+
+        renderApp();
+    } catch (err) {
+        console.error("Error loading from Supabase:", err);
+    }
+}
+
+// Note: Instead of a global saveState, we now have specific insert functions
+async function syncDeleteVideo(id) {
+    await _supabase.from('videos').delete().eq('id', id);
+}
+
+async function syncDeleteTestimonial(id) {
+    await _supabase.from('testimonials').delete().eq('id', id);
+}
+
+// ===================
 // INITIALIZATION
 // ===================
 document.addEventListener("DOMContentLoaded", () => {
     // Admin Toggle Listener (moved to logo Easter Egg)
 
     // Upload Forms Listeners
-    document.getElementById('videoUploadForm').addEventListener('submit', submitVideoUpload);
-    document.getElementById('imageUploadForm').addEventListener('submit', submitImageUpload);
-    document.getElementById('leaveReviewForm').addEventListener('submit', submitTextTestimonial);
+    const videoUploadForm = document.getElementById('videoUploadForm');
+    if (videoUploadForm) videoUploadForm.addEventListener('submit', submitVideoUpload);
+    
+    const imageUploadForm = document.getElementById('imageUploadForm');
+    if (imageUploadForm) imageUploadForm.addEventListener('submit', submitImageUpload);
+    
+    const leaveReviewForm = document.getElementById('leaveReviewForm');
+    if (leaveReviewForm) leaveReviewForm.addEventListener('submit', submitTextTestimonial);
 
-    // Dropzone click listeners
-    document.getElementById('videoDropzone').addEventListener('click', () => document.getElementById('videoFileInput').click());
-    document.getElementById('imageDropzone').addEventListener('click', () => document.getElementById('imageFileInput').click());
+    // Dropzone click listeners (Only if elements exist)
+    const videoDropzone = document.getElementById('videoDropzone');
+    if (videoDropzone) {
+        videoDropzone.addEventListener('click', () => {
+            const fileInput = document.getElementById('videoFileInput');
+            if (fileInput) fileInput.click();
+        });
+    }
+
+    const imageDropzone = document.getElementById('imageDropzone');
+    if (imageDropzone) {
+        imageDropzone.addEventListener('click', () => {
+            const fileInput = document.getElementById('imageFileInput');
+            if (fileInput) fileInput.click();
+        });
+    }
 
     // Initial render
-    renderApp();
+    loadState(); // Pull from Supabase on load
     initStatCounters(); // Start up the stats animation logic
+    initCloudinary(); // Setup Cloudinary Widget
 });
 
 // ===================
@@ -108,6 +178,51 @@ function initStatCounters() {
     }, { threshold: 0.1 });
 
     observer.observe(statsBar);
+}
+
+function initCloudinary() {
+    const uploadBtn = document.getElementById('cloudinaryUploadBtn');
+    if (!uploadBtn) return;
+
+    uploadBtn.addEventListener('click', () => {
+        console.log("Cloudinary button clicked. Checking for 'cloudinary' library...");
+        
+        if (typeof cloudinary === 'undefined') {
+            alert("Error: Cloudinary library not loaded! Check your internet connection or script tag.");
+            return;
+        }
+
+        try {
+            cloudinary.openUploadWidget({
+                cloudName: CLOUDINARY_CLOUD_NAME,
+                uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+                sources: ['local', 'url'],
+                resourceType: 'video',
+                showAdvancedOptions: false,
+                cropping: false,
+                multiple: false,
+                defaultSource: 'local'
+            }, async (error, result) => {
+                if (error) {
+                    console.error("Cloudinary Widget Error:", error);
+                    alert("Cloudinary Error: " + error.message);
+                }
+                if (!error && result && result.event === "success") {
+                    console.log('Upload success:', result.info);
+                    
+                    document.getElementById('videoUrlInput').value = result.info.secure_url;
+                    if (result.info.original_filename) {
+                        document.getElementById('videoTitleInput').value = result.info.original_filename.split('_').join(' ');
+                    }
+
+                    await submitVideoUpload();
+                }
+            });
+        } catch (err) {
+            console.error("Critical error opening Cloudinary widget:", err);
+            alert("Could not open upload window. Make sure you are using a real web server (localhost) and not just double-clicking the file.");
+        }
+    });
 }
 
 
@@ -187,21 +302,40 @@ function renderVideos() {
     emptyState.style.display = 'none';
 
     state.videos.forEach(video => {
+        const url = video.video_url || video.videoUrl;
+        const embedInfo = getEmbedInfo(url);
+        const isEmbed = embedInfo.type !== 'direct';
+
         const cardHTML = `
         <div class="video-card animate-fade-in" onmouseenter="this.querySelector('.video-controls').style.opacity=1;" onmouseleave="this.querySelector('.video-controls').style.opacity=0;">
-            <div class="video-thumbnail-container" style="cursor: pointer;" onclick="togglePlayVideo(this)">
-                <video src="${video.videoUrl}" class="video-element" loop></video>
-                <div class="video-play-overlay">
-                    <div style="background: var(--primary-color); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.5);">
-                        <i data-lucide="play" fill="white" style="color:white; width: 28px; height: 28px; margin-left: 4px;"></i>
+            <div class="video-thumbnail-container" style="cursor: pointer; position: relative;">
+                ${isEmbed ? `
+                    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; width: 100%;">
+                        <iframe 
+                            src="${embedInfo.url}" 
+                            style="position: absolute; top:0; left:0; width:100%; height:100%; border:none;" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
                     </div>
-                </div>
+                ` : `
+                    <div onclick="togglePlayVideo(this)">
+                        <video src="${url}" class="video-element" loop></video>
+                        <div class="video-play-overlay">
+                            <div style="background: var(--primary-color); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.5);">
+                                <i data-lucide="play" fill="white" style="color:white; width: 28px; height: 28px; margin-left: 4px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                `}
 
                 <!-- Hover Controls -->
-                <div class="video-controls" style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem; background: linear-gradient(transparent, rgba(0,0,0,0.8)); display: flex; justify-content: flex-end; gap: 0.5rem; opacity: 0; transition: opacity 0.2s;">
+                <div class="video-controls" style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem; background: linear-gradient(transparent, rgba(0,0,0,0.8)); display: flex; justify-content: flex-end; gap: 0.5rem; opacity: 0; transition: opacity 0.2s; pointer-events: auto;">
+                    ${!isEmbed ? `
                     <button class="btn-icon" style="width: 32px; height: 32px;" onclick="event.stopPropagation(); toggleFullscreen(this.parentElement.parentElement.querySelector('.video-element'))">
                         <i data-lucide="maximize-2" style="width: 16px; height: 16px;"></i>
                     </button>
+                    ` : ''}
                 </div>
             </div>
             
@@ -270,7 +404,8 @@ function renderTestimonials() {
             </div>
             `;
         } else {
-            cardContent = `<img src="${testimonial.imageUrl}" alt="Client Testimonial" class="testimonial-img" />`;
+            const imgUrl = testimonial.image_url || testimonial.imageUrl;
+            cardContent = `<img src="${imgUrl}" alt="Client Testimonial" class="testimonial-img" />`;
         }
 
         const cardHTML = `
@@ -290,6 +425,7 @@ function renderTestimonials() {
 function deleteVideo(id) {
     if (confirm('Are you sure you want to delete this video?')) {
         state.videos = state.videos.filter(v => v.id !== id);
+        syncDeleteVideo(id);
         renderApp();
     }
 }
@@ -297,6 +433,7 @@ function deleteVideo(id) {
 function deleteTestimonial(id) {
     if (confirm('Are you sure you want to delete this screenshot?')) {
         state.testimonials = state.testimonials.filter(t => t.id !== id);
+        syncDeleteTestimonial(id);
         renderApp();
     }
 }
@@ -315,11 +452,32 @@ function togglePlayVideo(containerElement) {
 }
 
 function toggleFullscreen(videoElement) {
+    if (!videoElement) return;
     if (videoElement.requestFullscreen) {
         videoElement.requestFullscreen();
     } else if (videoElement.webkitRequestFullscreen) {
         videoElement.webkitRequestFullscreen();
     }
+}
+
+function getEmbedInfo(url) {
+    if (!url) return { type: 'direct', url: '' };
+
+    // YouTube
+    const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+    const ytMatch = url.match(ytRegex);
+    if (ytMatch) {
+        return { type: 'youtube', url: `https://www.youtube.com/embed/${ytMatch[1]}` };
+    }
+
+    // Vimeo
+    const vimeoRegex = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)([0-9]+)/;
+    const vimeoMatch = url.match(vimeoRegex);
+    if (vimeoMatch) {
+        return { type: 'vimeo', url: `https://player.vimeo.com/video/${vimeoMatch[1]}` };
+    }
+
+    return { type: 'direct', url: url };
 }
 
 
@@ -346,62 +504,45 @@ function closeModals(event) {
         document.querySelectorAll('.modal-overlay').forEach(el => el.style.display = 'none');
     }
 }
-
-
 // ===================
 // UPLOAD LOGIC
 // ===================
-function handleVideoFileSelect(event) {
-    const file = event.target.files[0];
-    if (file && file.type.startsWith('video/')) {
-        state.pendingVideoFile = file;
-        const prompt = document.getElementById('videoUploadPrompt');
 
-        // Show success UI inside dropzone
-        prompt.innerHTML = `
-            <i data-lucide="check-circle" style="color: var(--primary-color); width: 48px; height: 48px;"></i>
-            <div>
-                <p style="font-weight: 600; color: var(--text-main);">${file.name}</p>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">${(file.size / (1024 * 1024)).toFixed(2)} MB</p>
-            </div>
-        `;
-        // Put filename automatically in title
-        document.getElementById('videoTitleInput').value = file.name.split('.')[0];
-        lucide.createIcons();
-    }
-}
 
-function submitVideoUpload(e) {
-    e.preventDefault();
-    if (!state.pendingVideoFile) {
-        alert("Please select a video file first.");
+async function submitVideoUpload(e) {
+    if (e) e.preventDefault();
+    const videoUrl = document.getElementById('videoUrlInput').value;
+
+    if (!videoUrl) {
+        alert("Please enter a Video URL or upload via Cloudinary.");
         return;
     }
 
-    const title = document.getElementById('videoTitleInput').value;
-    const desc = document.getElementById('videoDescInput').value;
+    const title = document.getElementById('videoTitleInput').value || "New Edit";
+    const desc = document.getElementById('videoDescInput').value || "";
 
-    // Create Temporary Local url
-    const videoUrl = URL.createObjectURL(state.pendingVideoFile);
-
-    state.videos.unshift({
-        id: Date.now().toString(),
+    const newVideo = {
         title: title,
         description: desc,
-        videoUrl: videoUrl
-    });
+        video_url: videoUrl
+    };
+
+    // Push to Supabase
+    const { data, error } = await _supabase
+        .from('videos')
+        .insert([newVideo])
+        .select();
+
+    if (error) {
+        alert("Supabase Error: " + error.message);
+        return;
+    }
+
+    state.videos.unshift(data[0]);
 
     // Reset Form
     document.getElementById('videoUploadForm').reset();
-    state.pendingVideoFile = null;
-    document.getElementById('videoUploadPrompt').innerHTML = `
-        <i data-lucide="upload" style="color: var(--text-muted); width: 48px; height: 48px;"></i>
-        <div>
-            <p style="font-weight: 600; color: var(--text-main);">Click to upload video</p>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">MP4, WebM or OGG</p>
-        </div>
-    `;
-
+    
     closeModal('uploadVideoModal');
     renderApp();
 }
@@ -423,37 +564,39 @@ function handleImageFileSelect(event) {
     }
 }
 
-function submitImageUpload(e) {
+async function submitImageUpload(e) {
     e.preventDefault();
     if (!state.pendingImageFile) {
         alert("Please select an image file first.");
         return;
     }
 
-    // Create Temporary Local url
+    // Create Temporary Local url (Ideally used with Cloudinary for permanent hosting)
     const imageUrl = URL.createObjectURL(state.pendingImageFile);
 
-    state.testimonials.unshift({
-        id: Date.now().toString(),
-        imageUrl: imageUrl
-    });
+    const newTestimonial = {
+        type: 'image',
+        image_url: imageUrl
+    };
+
+    const { data, error } = await _supabase
+        .from('testimonials')
+        .insert([newTestimonial])
+        .select();
+
+    if (!error) {
+        state.testimonials.unshift(data[0]);
+    }
 
     // Reset Form
     document.getElementById('imageUploadForm').reset();
     state.pendingImageFile = null;
-    document.getElementById('imageUploadPrompt').innerHTML = `
-        <i data-lucide="upload" style="color: var(--text-muted); width: 48px; height: 48px;"></i>
-        <div>
-            <p style="font-weight: 600; color: var(--text-main);">Click to upload screenshot</p>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">PNG, JPG or WebP</p>
-        </div>
-    `;
 
     closeModal('uploadImageModal');
     renderApp();
 }
 
-function submitTextTestimonial(e) {
+async function submitTextTestimonial(e) {
     e.preventDefault();
 
     const name = document.getElementById('reviewerNameInput').value;
@@ -462,12 +605,23 @@ function submitTextTestimonial(e) {
 
     if (!name || !role || !text) return;
 
-    state.testimonials.unshift({
-        id: Date.now().toString(),
+    const newReview = {
         type: 'text',
         name: `${name} - ${role}`,
         text: text
-    });
+    };
+
+    const { data, error } = await _supabase
+        .from('testimonials')
+        .insert([newReview])
+        .select();
+
+    if (error) {
+        alert("Error saving review: " + error.message);
+        return;
+    }
+
+    state.testimonials.unshift(data[0]);
 
     // Reset Form
     document.getElementById('leaveReviewForm').reset();
@@ -475,7 +629,6 @@ function submitTextTestimonial(e) {
     closeModal('leaveReviewModal');
     renderApp();
 
-    // Small timeout to allow render to happen before alert
     setTimeout(() => {
         alert("Thank you! Your testimonial has been published.");
     }, 100);
