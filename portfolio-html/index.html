@@ -278,7 +278,7 @@
 
                 <button type="submit" class="btn-primary"
                     style="width: 100%; justify-content: center; margin-top: 1rem;">
-                    Add to Portfolio
+                    Upload to Database
                 </button>
             </form>
         </div>
@@ -297,19 +297,19 @@
             </div>
 
             <form id="imageUploadForm" style="display: flex; flex-direction: column; gap: 1.5rem;">
-                <div id="imageDropzone"
-                    style="border: 2px dashed var(--surface-border); border-radius: 12px; padding: 3rem 2rem; text-align: center; background-color: rgba(255, 255, 255, 0.02); transition: all 0.2s ease; cursor: pointer;">
-                    <input type="file" id="imageFileInput" accept="image/*" style="display: none;"
-                        onchange="handleImageFileSelect(event)">
+                <div>
+                    <label
+                        style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted);">Image URL</label>
+                    <input type="url" id="imageUrlInput" placeholder="Paste link here..." required>
+                </div>
 
-                    <div id="imageUploadPrompt"
-                        style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
-                        <i data-lucide="upload" style="color: var(--text-muted); width: 48px; height: 48px;"></i>
-                        <div>
-                            <p style="font-weight: 600; color: var(--text-main);">Click to upload screenshot</p>
-                            <p style="font-size: 0.85rem; color: var(--text-muted);">PNG, JPG or WebP</p>
-                        </div>
-                    </div>
+                <div style="text-align: center; padding: 1rem; border: 1px dashed var(--surface-border); border-radius: 12px; background: rgba(255,255,255,0.02);">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">OR upload directly to your cloud storage</p>
+                    <button type="button" class="btn-primary" id="cloudinaryImageUploadBtn" style="width: 100%; justify-content: center; background: #3448c5;">
+                        <i data-lucide="upload-cloud"></i>
+                        <span>Upload to Cloudinary</span>
+                    </button>
+                    <p id="cloudinaryImageStatus" style="font-size: 0.75rem; color: var(--primary-color); margin-top: 0.5rem; display: none;">Upload successful!</p>
                 </div>
 
                 <button type="submit" class="btn-primary"
