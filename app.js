@@ -246,25 +246,43 @@ function renderVideos() {
         const embedInfo = getEmbedInfo(url);
         const isEmbed = embedInfo.type !== 'direct';
 
+        let thumbnailHtml = '';
+        if (embedInfo.type === 'youtube') {
+            thumbnailHtml = `
+                <div onclick="playYoutubeVideo(this, '${embedInfo.id}')" style="cursor: pointer; position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16/9;">
+                    <img src="https://img.youtube.com/vi/${embedInfo.id}/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/${embedInfo.id}/hqdefault.jpg';" style="width: 100%; height: auto; object-fit: contain;">
+                    <div class="video-play-overlay">
+                        <div style="background: var(--primary-color); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(99,102, 241, 0.5);">
+                            <i data-lucide="play" fill="white" style="color:white; width: 28px; height: 28px;"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (embedInfo.type === 'vimeo') {
+            thumbnailHtml = `
+                <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; width: 100%; border-radius: 12px;">
+                    <iframe src="${embedInfo.url}" style="position: absolute; top:0; left:0; width:100%; height:100%; border:none;" allowfullscreen></iframe>
+                </div>
+            `;
+        } else {
+            thumbnailHtml = `
+                <div onclick="togglePlayVideo(this)">
+                    <video src="${url}" class="video-element" loop></video>
+                    <div class="video-play-overlay">
+                        <div style="background: var(--primary-color); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(99,102, 241, 0.5);">
+                            <i data-lucide="play" fill="white" style="color:white; width: 28px; height: 28px;"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         container.insertAdjacentHTML('beforeend', `
             <div class="video-card animate-fade-in">
                 <div class="video-thumbnail-container" style="position: relative;">
-                    ${isEmbed ? `
-                        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; width: 100%;">
-                            <iframe src="${embedInfo.url}" style="position: absolute; top:0; left:0; width:100%; height:100%; border:none;" allowfullscreen></iframe>
-                        </div>
-                    ` : `
-                        <div onclick="togglePlayVideo(this)">
-                            <video src="${url}" class="video-element" loop></video>
-                            <div class="video-play-overlay">
-                                <div style="background: var(--primary-color); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(99,102, 241, 0.5);">
-                                    <i data-lucide="play" fill="white" style="color:white; width: 28px; height: 28px;"></i>
-                                </div>
-                            </div>
-                        </div>
-                    `}
-                    <div class="video-controls" style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem; opacity: 0; transition: opacity 0.2s;">
-                        ${!isEmbed ? `<button class="btn-icon" onclick="event.stopPropagation(); toggleFullscreen(this.parentElement.parentElement.querySelector('.video-element'))"><i data-lucide="maximize-2"></i></button>` : ''}
+                    ${thumbnailHtml}
+                    <div class="video-controls" style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem; opacity: 0; transition: opacity 0.2s; pointer-events: none;">
+                        ${!isEmbed ? `<button class="btn-icon" style="pointer-events: auto;" onclick="event.stopPropagation(); toggleFullscreen(this.parentElement.parentElement.querySelector('.video-element'))"><i data-lucide="maximize-2"></i></button>` : ''}
                     </div>
                 </div>
                 <div class="video-info">
@@ -330,13 +348,25 @@ function toggleFullscreen(v) {
     else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen();
 }
 
+function playYoutubeVideo(el, id) {
+    el.innerHTML = `
+        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; width: 100%; border-radius: 12px;">
+            <iframe src="https://www.youtube.com/embed/${id}?autoplay=1&controls=1&rel=0&modestbranding=1&playsinline=1" style="position: absolute; top:0; left:0; width:100%; height:100%; border:none;" allowfullscreen autoplay playsinline></iframe>
+        </div>
+    `;
+    el.style.aspectRatio = "unset";
+    el.style.background = "none";
+    el.style.cursor = "default";
+    el.onclick = null;
+}
+
 function getEmbedInfo(url) {
-    if (!url) return { type: 'direct', url: '' };
-    const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-    if (ytMatch) return { type: 'youtube', url: `https://www.youtube.com/embed/${ytMatch[1]}` };
+    if (!url) return { type: 'direct', url: '', id: null };
+    const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    if (ytMatch) return { type: 'youtube', url: `https://www.youtube.com/embed/${ytMatch[1]}`, id: ytMatch[1] };
     const vimeoMatch = url.match(/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)([0-9]+)/);
-    if (vimeoMatch) return { type: 'vimeo', url: `https://player.vimeo.com/video/${vimeoMatch[1]}` };
-    return { type: 'direct', url: url };
+    if (vimeoMatch) return { type: 'vimeo', url: `https://player.vimeo.com/video/${vimeoMatch[1]}`, id: vimeoMatch[1] };
+    return { type: 'direct', url: url, id: null };
 }
 
 function openModal(id) { document.getElementById(id).style.display = 'flex'; }
