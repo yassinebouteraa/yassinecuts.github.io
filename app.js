@@ -1,6 +1,9 @@
 // ===================
 // CONFIGURATION
 // ===================
+const CLOUDINARY_CLOUD_NAME = 'dtxm5kfuk';
+const CLOUDINARY_UPLOAD_PRESET = 'Ai Video';
+
 const SUPABASE_URL = 'https://sorjwworxlwyxtipxgcb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_AQDK0RKux_i5eTsjJSXFPw_dNDUP9xP'; 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -48,12 +51,6 @@ async function loadState() {
 async function syncDeleteVideo(id, videoUrl) {
     // Delete from DB
     await _supabase.from('videos').delete().eq('id', id);
-    
-    // Delete physical file from Supabase Storage if it was uploaded there
-    if (videoUrl && videoUrl.includes('storage.v1/object/public/videos/')) {
-        const fileName = videoUrl.split('/').pop();
-        await _supabase.storage.from('videos').remove([fileName]);
-    }
 }
 
 async function syncDeleteTestimonial(id) {
@@ -64,10 +61,6 @@ async function syncDeleteTestimonial(id) {
 // INITIALIZATION
 // ===================
 document.addEventListener("DOMContentLoaded", () => {
-    // Dropzone logic
-    setupDropzone('videoDropzone', 'videoFileInput', handleVideoFileSelect);
-    setupDropzone('imageDropzone', 'imageFileInput', handleImageFileSelect);
-
     // Form Listeners
     const videoUploadForm = document.getElementById('videoUploadForm');
     if (videoUploadForm) videoUploadForm.addEventListener('submit', handleVideoFormSubmit);
@@ -81,36 +74,56 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initial render
     loadState();
     initStatCounters();
+    initCloudinary();
 });
 
-function setupDropzone(dropzoneId, inputId, handleFn) {
-    const dropzone = document.getElementById(dropzoneId);
-    const input = document.getElementById(inputId);
-    if (!dropzone || !input) return;
+function initCloudinary() {
+    const uploadBtn = document.getElementById('cloudinaryUploadBtn');
+    if (uploadBtn) {
+        uploadBtn.addEventListener('click', () => {
+            if (typeof cloudinary === 'undefined') {
+                alert("Error: Cloudinary library not loaded!");
+                return;
+            }
+            cloudinary.openUploadWidget({
+                cloudName: CLOUDINARY_CLOUD_NAME,
+                uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+                sources: ['local', 'url'],
+                resourceType: 'video',
+                multiple: false
+            }, (error, result) => {
+                if (!error && result && result.event === "success") {
+                    document.getElementById('videoUrlInput').value = result.info.secure_url;
+                    if (result.info.original_filename) {
+                        document.getElementById('videoTitleInput').value = result.info.original_filename.split('_').join(' ');
+                    }
+                    document.getElementById('cloudinaryStatus').style.display = 'block';
+                }
+            });
+        });
+    }
 
-    dropzone.addEventListener('click', () => input.click());
-
-    dropzone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropzone.style.borderColor = 'var(--primary-color)';
-        dropzone.style.backgroundColor = 'rgba(99, 102, 241, 0.05)';
-    });
-
-    dropzone.addEventListener('dragleave', () => {
-        dropzone.style.borderColor = 'var(--surface-border)';
-        dropzone.style.backgroundColor = 'rgba(255, 255, 255, 0.02)';
-    });
-
-    dropzone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropzone.style.borderColor = 'var(--surface-border)';
-        dropzone.style.backgroundColor = 'rgba(255, 255, 255, 0.02)';
-        
-        if (e.dataTransfer.files.length > 0) {
-            const mockEvent = { target: { files: e.dataTransfer.files } };
-            handleFn(mockEvent);
-        }
-    });
+    const imageUploadBtn = document.getElementById('cloudinaryImageUploadBtn');
+    if (imageUploadBtn) {
+        imageUploadBtn.addEventListener('click', () => {
+            if (typeof cloudinary === 'undefined') {
+                alert("Error: Cloudinary library not loaded!");
+                return;
+            }
+            cloudinary.openUploadWidget({
+                cloudName: CLOUDINARY_CLOUD_NAME,
+                uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+                sources: ['local', 'url', 'camera'],
+                resourceType: 'image',
+                multiple: false
+            }, (error, result) => {
+                if (!error && result && result.event === "success") {
+                    document.getElementById('imageUrlInput').value = result.info.secure_url;
+                    document.getElementById('cloudinaryImageStatus').style.display = 'block';
+                }
+            });
+        });
+    }
 }
 
 // ===================
@@ -145,110 +158,19 @@ function initStatCounters() {
 // ===================
 // UPLOAD LOGIC
 // ===================
-function handleVideoFileSelect(event) {
-    const file = event.target.files[0];
-    if (file) {
-        state.pendingVideoFile = file;
-        
-        // Auto-fill title from filename
-        const cleanName = file.name.split('.')[0].replace(/[_-]/g, ' ');
-        document.getElementById('videoTitleInput').value = cleanName;
-        
-        document.getElementById('videoUploadPrompt').innerHTML = `
-            <div style="background: rgba(99, 102, 241, 0.1); padding: 1rem; border-radius: 8px; width: 100%;">
-                <i data-lucide="check-circle" style="color: var(--primary-color); width: 32px; height: 32px; margin-bottom: 0.5rem;"></i>
-                <p style="font-weight: 600; font-size: 0.9rem;">${file.name}</p>
-                <p style="font-size: 0.75rem; color: var(--text-muted);">Ready to upload to database</p>
-                <button type="button" class="btn-icon" style="margin: 0.5rem auto 0; width: 30px; height: 30px;" onclick="event.stopPropagation(); state.pendingVideoFile=null; resetVideoPrompt();"><i data-lucide="x" style="width: 14px; height: 14px;"></i></button>
-            </div>
-        `;
-        lucide.createIcons();
-    }
-}
-
-function handleImageFileSelect(event) {
-    const file = event.target.files[0];
-    if (file) {
-        state.pendingImageFile = file;
-        document.getElementById('imageUploadPrompt').innerHTML = `
-            <div style="background: rgba(236, 72, 153, 0.1); padding: 1rem; border-radius: 8px; width: 100%;">
-                <i data-lucide="check-circle" style="color: var(--accent-color); width: 32px; height: 32px; margin-bottom: 0.5rem;"></i>
-                <p style="font-weight: 600; font-size: 0.9rem;">${file.name}</p>
-                <p style="font-size: 0.75rem; color: var(--text-muted);">Screenshot selected</p>
-            </div>
-        `;
-        lucide.createIcons();
-    }
-}
-
-function resetVideoPrompt() {
-    document.getElementById('videoUploadPrompt').innerHTML = `
-        <i data-lucide="upload" style="color: var(--text-muted); width: 48px; height: 48px;"></i>
-        <div>
-            <p style="font-weight: 600; color: var(--text-main);">Click to upload video</p>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">MP4, WebM or OGG (Unlimited Size)</p>
-        </div>
-    `;
-    lucide.createIcons();
-}
-
 async function handleVideoFormSubmit(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     
-    const urlInput = document.getElementById('videoUrlInput').value;
-    const title = document.getElementById('videoTitleInput').value || "New Edit";
-    const desc = document.getElementById('videoDescInput').value || "";
-
-    // If manual link was provided
-    if (urlInput) {
-        await submitVideoToDB(urlInput, title, desc);
+    const videoUrl = document.getElementById('videoUrlInput').value;
+    if (!videoUrl) {
+        alert("Please enter a Video URL or upload via Cloudinary.");
         return;
     }
 
-    // If a file was selected for database upload
-    if (state.pendingVideoFile) {
-        const file = state.pendingVideoFile;
-        const progressContainer = document.getElementById('uploadProgressContainer');
-        const progressBar = document.getElementById('uploadProgressBar');
-        const progressText = document.getElementById('uploadProgressText');
-        
-        progressContainer.style.display = 'block';
-        
-        try {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
-            const filePath = `${fileName}`;
+    const title = document.getElementById('videoTitleInput').value || "New Edit";
+    const desc = document.getElementById('videoDescInput').value || "";
 
-            const { data, error } = await _supabase.storage
-                .from('videos')
-                .upload(filePath, file, {
-                    cacheControl: '3600',
-                    upsert: false,
-                    onUploadProgress: (progress) => {
-                        const percent = Math.round((progress.loaded / progress.total) * 100);
-                        progressBar.style.width = percent + '%';
-                        progressText.innerText = `Uploading... ${percent}%`;
-                    }
-                });
-
-            if (error) throw error;
-
-            progressBar.style.width = '100%';
-            progressText.innerText = `Finalizing...`;
-
-            const { data: { publicUrl } } = _supabase.storage.from('videos').getPublicUrl(filePath);
-            await submitVideoToDB(publicUrl, title, desc);
-            
-        } catch (err) {
-            alert("Upload failed: " + err.message);
-            console.error(err);
-        } finally {
-            progressContainer.style.display = 'none';
-            state.pendingVideoFile = null;
-        }
-    } else {
-        alert("Please select a file or paste a link.");
-    }
+    await submitVideoToDB(videoUrl, title, desc);
 }
 
 async function submitVideoToDB(videoUrl, title, desc) {
@@ -264,13 +186,9 @@ async function submitVideoToDB(videoUrl, title, desc) {
 
     state.videos.unshift(data[0]);
     document.getElementById('videoUploadForm').reset();
-    document.getElementById('videoUploadPrompt').innerHTML = `
-        <i data-lucide="upload" style="color: var(--text-muted); width: 48px; height: 48px;"></i>
-        <div>
-            <p style="font-weight: 600; color: var(--text-main);">Click to upload video</p>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">MP4, WebM or OGG (Unlimited Size)</p>
-        </div>
-    `;
+    if (document.getElementById('cloudinaryStatus')) {
+        document.getElementById('cloudinaryStatus').style.display = 'none';
+    }
     closeModal('uploadVideoModal');
     renderApp();
 }
@@ -426,47 +344,30 @@ function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 function closeModals(e) { if (e.target.classList.contains('modal-overlay')) document.querySelectorAll('.modal-overlay').forEach(el => el.style.display = 'none'); }
 
 async function submitImageUpload(e) {
-    e.preventDefault();
-    const file = state.pendingImageFile;
-    if (!file) {
-        alert("Please select a screenshot first.");
+    if (e) e.preventDefault();
+    
+    const imageUrl = document.getElementById('imageUrlInput').value;
+    if (!imageUrl) {
+        alert("Please provide an Image URL or upload one first.");
         return;
     }
     
     try {
-        const { data: uploadData, error: uploadError } = await _supabase.storage
-            .from('videos') // Using the same bucket for simplicity, or change to 'testimonials' if configured
-            .upload(`testimonials/${Date.now()}-${file.name}`, file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = _supabase.storage.from('videos').getPublicUrl(uploadData.path);
-        const { data, error } = await _supabase.from('testimonials').insert([{ type: 'image', image_url: publicUrl }]).select();
+        const { data, error } = await _supabase.from('testimonials').insert([{ type: 'image', image_url: imageUrl }]).select();
         
         if (error) throw error;
 
         state.testimonials.unshift(data[0]);
         document.getElementById('imageUploadForm').reset();
-        resetImagePrompt();
+        if (document.getElementById('cloudinaryImageStatus')) {
+            document.getElementById('cloudinaryImageStatus').style.display = 'none';
+        }
         closeModal('uploadImageModal');
         renderApp();
     } catch (err) {
-        alert("Image upload failed: " + err.message);
+        alert("Database error: " + err.message);
         console.error(err);
-    } finally {
-        state.pendingImageFile = null;
     }
-}
-
-function resetImagePrompt() {
-    document.getElementById('imageUploadPrompt').innerHTML = `
-        <i data-lucide="upload" style="color: var(--text-muted); width: 48px; height: 48px;"></i>
-        <div>
-            <p style="font-weight: 600; color: var(--text-main);">Click to upload screenshot</p>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">PNG, JPG or WebP</p>
-        </div>
-    `;
-    lucide.createIcons();
 }
 
 async function submitTextTestimonial(e) {
