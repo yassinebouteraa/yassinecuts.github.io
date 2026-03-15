@@ -163,21 +163,22 @@
                 <p style="color: var(--text-muted); margin-top: 0.5rem;">Choose the perfect fit for your content needs</p>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 4rem;">
                 <!-- Starter Package -->
                 <div class="glass-panel" style="padding: 2.5rem; transition: transform 0.3s ease; border: 1px solid var(--surface-border);" onmouseenter="this.style.transform='translateY(-10px)'" onmouseleave="this.style.transform='translateY(0)'">
-                    <h4 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">The <span class="text-gradient">Hook</span></h4>
-                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">Perfect for individual creators</p>
+                    <h4 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Basic <span class="text-gradient">Edit</span></h4>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">Perfect for simple, clean content</p>
                     <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 2rem;">$49 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/video</span></div>
                     
                     <ul style="list-style: none; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
                         <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Up to 60s Reel/Short</span></li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Basic Cuts</span></li>
                         <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Motion Captions</span></li>
                         <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Stock Music & SFX</span></li>
                         <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>1 Revision</span></li>
                     </ul>
 
-                    <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="selectPackage('The Hook')">Select Package</button>
+                    <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="selectPackage('Basic Edit')">Select Package</button>
                 </div>
 
                 <!-- Growth Package (Featured) -->
@@ -189,7 +190,8 @@
                     
                     <ul style="list-style: none; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
                         <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Cinematic Storytelling</span></li>
-                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Advanced VFX & Hooks</span></li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>High-Retention Editing</span></li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Advanced Hooks & VFX</span></li>
                         <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Color Grading</span></li>
                         <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Fast 48h Delivery</span></li>
                     </ul>
@@ -201,7 +203,7 @@
                 <div class="glass-panel" style="padding: 2.5rem; transition: transform 0.3s ease; border: 1px solid var(--surface-border);" onmouseenter="this.style.transform='translateY(-10px)'" onmouseleave="this.style.transform='translateY(0)'">
                     <h4 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">The <span class="text-gradient">Elite</span></h4>
                     <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">Full YouTube/Ads production</p>
-                    <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 2rem;">$299 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/start</span></div>
+                    <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 2rem;">$299+</div>
                     
                     <ul style="list-style: none; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
                         <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Long-form Content (10m+)</span></li>
@@ -211,6 +213,34 @@
                     </ul>
 
                     <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="selectPackage('The Elite')">Select Package</button>
+                </div>
+            </div>
+
+            <!-- Monthly Packages Section -->
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h4 style="font-size: 1.8rem; font-weight: 700;">Monthly <span class="text-gradient">Retainers</span></h4>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">Scale your brand with consistent, high-quality content</p>
+            </div>
+
+            <div style="max-width: 900px; margin: 0 auto;">
+                <div class="glass-panel" style="padding: 2.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem; background: linear-gradient(90deg, rgba(99, 102, 241, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%);">
+                    <div style="flex: 1; min-width: 250px;">
+                        <h5 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;">Creator <span class="text-gradient">Package</span></h5>
+                        <p style="color: var(--text-muted);">Master the algorithm with a steady flow of content.</p>
+                        <div style="display: flex; gap: 1.5rem; margin-top: 1.5rem; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
+                                <i data-lucide="film" style="width: 20px; color: var(--primary-color);"></i> 12 Shorts / Month
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
+                                <i data-lucide="zap" style="width: 20px; color: var(--accent-color);"></i> Priority Delivery
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: right; min-width: 200px;">
+                        <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem;">$1290 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/mo</span></div>
+                        <button class="btn-primary" style="background: linear-gradient(135deg, #4f46e5, #ec4899);" onclick="selectPackage('Creator Package (Monthly)')">Get Access</button>
+                    </div>
                 </div>
             </div>
         </section>
