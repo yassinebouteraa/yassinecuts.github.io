@@ -71,6 +71,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const leaveReviewForm = document.getElementById('leaveReviewForm');
     if (leaveReviewForm) leaveReviewForm.addEventListener('submit', submitTextTestimonial);
 
+    const hireMeForm = document.getElementById('hireMeForm');
+    if (hireMeForm) hireMeForm.addEventListener('submit', submitHireMeForm);
+
     // Initial render
     loadState();
     initStatCounters();
@@ -421,4 +424,62 @@ async function submitTextTestimonial(e) {
     document.getElementById('leaveReviewForm').reset();
     closeModal('leaveReviewModal');
     renderApp();
+}
+
+async function submitHireMeForm(e) {
+    e.preventDefault();
+    const btn = document.getElementById('hireSubmitBtn');
+    const successMsg = document.getElementById('hireSuccessMsg');
+    const errorMsg = document.getElementById('hireErrorMsg');
+    
+    btn.innerText = 'Sending...';
+    btn.style.opacity = '0.7';
+    btn.disabled = true;
+
+    const name = document.getElementById('hireName').value;
+    const email = document.getElementById('hireEmail').value;
+    const message = document.getElementById('hireMessage').value;
+
+    try {
+        // Option 1: FormSubmit API for sending an email directly to your matched email
+        const response = await fetch("https://formsubmit.co/ajax/yassineebt12@gmail.com", {
+            method: "POST",
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                message: message,
+                _subject: "New Hire Inquiry from YassineCuts Portfolio!"
+            })
+        });
+
+        if (!response.ok) throw new Error("Email sending failed");
+
+        // Option 2: Also store to Supabase just in case you ever add a 'messages' table
+        try {
+            await _supabase.from('messages').insert([{ name, email, message }]);
+        } catch(e) {} // Fail gracefully if table doesn't exist
+
+        successMsg.style.display = 'block';
+        errorMsg.style.display = 'none';
+        document.getElementById('hireMeForm').reset();
+        
+        setTimeout(() => {
+            closeModal('hireMeModal');
+            successMsg.style.display = 'none';
+            btn.innerText = 'Send Inquiry';
+            btn.style.opacity = '1';
+            btn.disabled = false;
+        }, 3000);
+    } catch (err) {
+        console.error("Submission error:", err);
+        errorMsg.style.display = 'block';
+        successMsg.style.display = 'none';
+        btn.innerText = 'Send Inquiry';
+        btn.style.opacity = '1';
+        btn.disabled = false;
+    }
 }

@@ -40,6 +40,11 @@
                 <a href="#contact" style="color: var(--text-muted); font-weight: 500; text-decoration: none;"
                     class="nav-link">Contact</a>
 
+                <button class="btn-primary" style="background: linear-gradient(135deg, #4f46e5, #ec4899);" onclick="openModal('hireMeModal')">
+                    <i data-lucide="briefcase" style="width: 20px; height: 20px;"></i>
+                    <span>Hire Me</span>
+                </button>
+
                 <button class="btn-primary admin-only" onclick="openModal('uploadVideoModal')">
                     <i data-lucide="plus" style="width: 20px; height: 20px;"></i>
                     <span>Add Video</span>
@@ -69,11 +74,11 @@
                     clients.
                 </p>
 
-                <div style="display: flex; gap: 1rem; justify-content: center; align-items: center;">
-                    <button class="btn-primary admin-only" style="padding: 1rem 2rem; font-size: 1.1rem;"
-                        onclick="openModal('uploadVideoModal')">
-                        <i data-lucide="upload-cloud" style="width: 24px; height: 24px;"></i>
-                        <span>Upload New Work</span>
+                <div style="display: flex; gap: 1rem; justify-content: center; align-items: center; flex-wrap: wrap;">
+                    <button class="btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem; background: linear-gradient(135deg, #4f46e5, #ec4899);"
+                        onclick="openModal('hireMeModal')">
+                        <i data-lucide="briefcase" style="width: 24px; height: 24px;"></i>
+                        <span>Hire Me</span>
                     </button>
 
                     <a href="#showreel"
@@ -83,6 +88,12 @@
                         <span>Unlock My Showreel</span>
                         <i data-lucide="arrow-down" style="width: 20px; height: 20px;"></i>
                     </a>
+
+                    <button class="btn-primary admin-only" style="padding: 1rem 2rem; font-size: 1.1rem;"
+                        onclick="openModal('uploadVideoModal')">
+                        <i data-lucide="upload-cloud" style="width: 24px; height: 24px;"></i>
+                        <span>Upload New Work</span>
+                    </button>
                 </div>
 
                 <!-- Stats Bar -->
@@ -357,6 +368,42 @@
                     style="width: 100%; justify-content: center; margin-top: 1rem;">
                     Submit Testimonial
                 </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hire Me Modal (Public) -->
+    <div id="hireMeModal" class="modal-overlay" onclick="closeModals(event)">
+        <div class="glass-panel modal-content" onclick="event.stopPropagation()">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="briefcase" class="text-gradient"></i> Let's Work Together
+                </h2>
+                <button class="btn-icon" onclick="closeModal('hireMeModal')">
+                    <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+                </button>
+            </div>
+
+            <form id="hireMeForm" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted);">Name *</label>
+                    <input type="text" id="hireName" placeholder="Your Name or Company" required>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted);">Email *</label>
+                    <input type="email" id="hireEmail" placeholder="you@example.com" required>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted);">Project Details *</label>
+                    <textarea id="hireMessage" placeholder="Tell me about your project, timeline, and goals..." rows="4" required></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary" id="hireSubmitBtn"
+                    style="width: 100%; justify-content: center; margin-top: 1rem;">
+                    Send Inquiry
+                </button>
+                <p id="hireSuccessMsg" style="display: none; color: #10b981; font-size: 0.9rem; text-align: center; margin-top: 0.5rem;">Message sent successfully! I'll be in touch soon.</p>
+                <p id="hireErrorMsg" style="display: none; color: #ef4444; font-size: 0.9rem; text-align: center; margin-top: 0.5rem;">Oops, something went wrong. Please try again.</p>
             </form>
         </div>
     </div>
