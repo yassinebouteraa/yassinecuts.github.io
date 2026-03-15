@@ -401,3 +401,133 @@ body.admin-mode button.admin-only {
     object-fit: contain;
     background: #000;
 }
+
+/* MOBILE RESPONSIVENESS */
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 1.5rem;
+    }
+
+    header {
+        margin: 0.5rem !important;
+        padding: 0.75rem 1rem !important;
+        border-radius: 12px !important;
+    }
+
+    nav {
+        display: none !important; /* Hide standard nav on mobile */
+    }
+
+    .mobile-menu-btn {
+        display: flex !important;
+    }
+
+    header .container {
+        justify-content: space-between;
+    }
+
+    /* Adjust Hero Section */
+    .hero-title {
+        font-size: 2.5rem !important;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem !important;
+    }
+
+    /* Adjust Stats Bar */
+    #statsBar {
+        padding: 1.5rem !important;
+        gap: 1.5rem !important;
+    }
+
+    #statsBar div {
+        border: none !important;
+        min-width: 120px !important;
+    }
+
+    #statsBar h4 {
+        font-size: 2.2rem !important;
+    }
+
+    /* Adjust Pricing Cards to stack well */
+    #packages > div:nth-child(2) {
+        grid-template-columns: 1fr !important;
+        padding: 0 1rem;
+    }
+
+    #packages .glass-panel {
+        transform: none !important; /* Remove scaling on mobile to prevent overflow */
+        margin-bottom: 1rem;
+    }
+
+    /* Monthly Package Card */
+    #packages > div:nth-child(4) > div {
+        flex-direction: column !important;
+        text-align: center !important;
+        padding: 2rem 1.5rem !important;
+    }
+
+    #packages > div:nth-child(4) > div > div:last-child {
+        text-align: center !important;
+        width: 100%;
+    }
+
+    /* Form Modals */
+    .modal-content {
+        max-width: 95% !important;
+        padding: 1.5rem !important;
+        margin: 1rem;
+    }
+
+    /* Tech Stack Gap */
+    #techStack {
+        gap: 1.5rem !important;
+        flex-wrap: wrap;
+    }
+}
+
+/* Mobile Menu Logic Styles */
+.mobile-nav {
+    position: fixed;
+    top: 5rem;
+    left: 1rem;
+    right: 1rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 2rem;
+    display: none;
+    flex-direction: column;
+    gap: 1.5rem;
+    z-index: 100;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.mobile-nav.active {
+    display: flex;
+}
+
+.mobile-nav a {
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.mobile-nav .btn-primary {
+    justify-content: center;
+}
+
+.mobile-menu-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--surface-color);
+    border: 1px solid var(--surface-border);
+    color: var(--text-main);
+}

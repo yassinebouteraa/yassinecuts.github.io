@@ -490,3 +490,8 @@ function selectPackage(name) {
     document.getElementById('hirePackage').value = name;
     openModal('hireMeModal');
 }
+
+function toggleMobileNav() {
+    const nav = document.getElementById('mobileNav');
+    nav.classList.toggle('active');
+}
