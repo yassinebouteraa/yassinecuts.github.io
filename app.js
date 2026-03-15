@@ -247,10 +247,12 @@ function renderVideos() {
         const isEmbed = embedInfo.type !== 'direct';
 
         let thumbnailHtml = '';
-        if (embedInfo.type === 'youtube') {
+        if (embedInfo.type === 'youtube' || embedInfo.type === 'youtube-short') {
+            const isShort = embedInfo.type === 'youtube-short';
+            const aspectStyle = isShort ? 'aspect-ratio: 9/16;' : 'aspect-ratio: 16/9;';
             thumbnailHtml = `
-                <div onclick="playYoutubeVideo(this, '${embedInfo.id}')" style="cursor: pointer; position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16/9;">
-                    <img src="https://img.youtube.com/vi/${embedInfo.id}/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/${embedInfo.id}/hqdefault.jpg';" style="width: 100%; height: auto; object-fit: contain;">
+                <div onclick="playYoutubeVideo(this, '${embedInfo.id}', ${isShort})" style="cursor: pointer; position: relative; width: 100%; display: flex; align-items: center; justify-content: center; background: #000; border-radius: 12px; overflow: hidden; ${aspectStyle}">
+                    <img src="https://img.youtube.com/vi/${embedInfo.id}/maxresdefault.jpg" onerror="this.onerror=null; this.src='https://img.youtube.com/vi/${embedInfo.id}/0.jpg';" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.85;">
                     <div class="video-play-overlay">
                         <div style="background: var(--primary-color); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(99,102, 241, 0.5);">
                             <i data-lucide="play" fill="white" style="color:white; width: 28px; height: 28px;"></i>
@@ -348,9 +350,10 @@ function toggleFullscreen(v) {
     else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen();
 }
 
-function playYoutubeVideo(el, id) {
+function playYoutubeVideo(el, id, isShort) {
+    const ratio = isShort ? 'padding-bottom: 177.77%;' : 'padding-bottom: 56.25%;';
     el.innerHTML = `
-        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; width: 100%; border-radius: 12px;">
+        <div style="position: relative; ${ratio} height: 0; overflow: hidden; width: 100%; border-radius: 12px;">
             <iframe src="https://www.youtube.com/embed/${id}?autoplay=1&controls=1&rel=0&modestbranding=1&playsinline=1" style="position: absolute; top:0; left:0; width:100%; height:100%; border:none;" allowfullscreen autoplay playsinline></iframe>
         </div>
     `;
@@ -362,8 +365,16 @@ function playYoutubeVideo(el, id) {
 
 function getEmbedInfo(url) {
     if (!url) return { type: 'direct', url: '', id: null };
-    const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    
+    // Check for shorts explicitly
+    const shortsMatch = url.match(/youtube\.com\/shorts\/([^"&?\/\s]{11})/);
+    if (shortsMatch) {
+        return { type: 'youtube-short', url: `https://www.youtube.com/embed/${shortsMatch[1]}`, id: shortsMatch[1] };
+    }
+
+    const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
     if (ytMatch) return { type: 'youtube', url: `https://www.youtube.com/embed/${ytMatch[1]}`, id: ytMatch[1] };
+    
     const vimeoMatch = url.match(/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)([0-9]+)/);
     if (vimeoMatch) return { type: 'vimeo', url: `https://player.vimeo.com/video/${vimeoMatch[1]}`, id: vimeoMatch[1] };
     return { type: 'direct', url: url, id: null };
