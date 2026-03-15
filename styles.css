@@ -404,7 +404,11 @@ body.admin-mode button.admin-only {
 
 /* MOBILE RESPONSIVENESS */
 
-@media (max-width: 768px) {
+@media (max-width: 991px) {
+    .hide-mobile {
+        display: none !important;
+    }
+
     .container {
         padding: 0 1.5rem;
     }
@@ -416,11 +420,11 @@ body.admin-mode button.admin-only {
     }
 
     nav {
-        display: none !important; /* Hide standard nav on mobile */
+        display: none !important; /* Hide desktop nav on mobile */
     }
 
     .mobile-menu-btn {
-        display: flex !important;
+        display: flex !important; /* Show hamburger on mobile */
     }
 
     header .container {
@@ -451,14 +455,13 @@ body.admin-mode button.admin-only {
         font-size: 2.2rem !important;
     }
 
-    /* Adjust Pricing Cards to stack well */
+    /* Adjust Pricing Cards */
     #packages > div:nth-child(2) {
         grid-template-columns: 1fr !important;
-        padding: 0 1rem;
     }
 
     #packages .glass-panel {
-        transform: none !important; /* Remove scaling on mobile to prevent overflow */
+        transform: none !important;
         margin-bottom: 1rem;
     }
 
@@ -466,7 +469,6 @@ body.admin-mode button.admin-only {
     #packages > div:nth-child(4) > div {
         flex-direction: column !important;
         text-align: center !important;
-        padding: 2rem 1.5rem !important;
     }
 
     #packages > div:nth-child(4) > div > div:last-child {
@@ -480,30 +482,36 @@ body.admin-mode button.admin-only {
         padding: 1.5rem !important;
         margin: 1rem;
     }
-
-    /* Tech Stack Gap */
-    #techStack {
-        gap: 1.5rem !important;
-        flex-wrap: wrap;
-    }
 }
 
-/* Mobile Menu Logic Styles */
+/* Base states for mobile-specific elements (Desktop view) */
+.mobile-menu-btn {
+    display: none; /* Hidden on PC */
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--surface-color);
+    border: 1px solid var(--surface-border);
+    color: var(--text-main);
+}
+
 .mobile-nav {
+    display: none; /* Hidden on PC */
     position: fixed;
-    top: 5rem;
+    top: 5.5rem;
     left: 1rem;
     right: 1rem;
     background: var(--glass-bg);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
     border-radius: 20px;
     padding: 2rem;
-    display: none;
     flex-direction: column;
     gap: 1.5rem;
     z-index: 100;
-    animation: fadeIn 0.3s ease-out;
 }
 
 .mobile-nav.active {
@@ -514,20 +522,10 @@ body.admin-mode button.admin-only {
     font-size: 1.25rem;
     font-weight: 600;
     text-align: center;
+    text-decoration: none;
+    color: var(--text-main);
 }
 
 .mobile-nav .btn-primary {
     justify-content: center;
-}
-
-.mobile-menu-btn {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: var(--surface-color);
-    border: 1px solid var(--surface-border);
-    color: var(--text-main);
 }
