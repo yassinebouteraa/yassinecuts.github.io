@@ -438,6 +438,7 @@ async function submitHireMeForm(e) {
 
     const name = document.getElementById('hireName').value;
     const email = document.getElementById('hireEmail').value;
+    const packageName = document.getElementById('hirePackage').value;
     const message = document.getElementById('hireMessage').value;
 
     try {
@@ -451,17 +452,18 @@ async function submitHireMeForm(e) {
             body: JSON.stringify({
                 name: name,
                 email: email,
+                package: packageName,
                 message: message,
-                _subject: "New Hire Inquiry from YassineCuts Portfolio!"
+                _subject: `New Inquiry: ${packageName} from YassineCuts Portfolio!`
             })
         });
 
         if (!response.ok) throw new Error("Email sending failed");
 
-        // Option 2: Also store to Supabase just in case you ever add a 'messages' table
+        // Option 2: Also store to Supabase just in case
         try {
-            await _supabase.from('messages').insert([{ name, email, message }]);
-        } catch(e) {} // Fail gracefully if table doesn't exist
+            await _supabase.from('messages').insert([{ name, email, package: packageName, message }]);
+        } catch(e) {} 
 
         successMsg.style.display = 'block';
         errorMsg.style.display = 'none';
@@ -482,4 +484,9 @@ async function submitHireMeForm(e) {
         btn.style.opacity = '1';
         btn.disabled = false;
     }
+}
+
+function selectPackage(name) {
+    document.getElementById('hirePackage').value = name;
+    openModal('hireMeModal');
 }
