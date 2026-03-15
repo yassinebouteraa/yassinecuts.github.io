@@ -183,6 +183,55 @@ textarea {
 input:focus,
 textarea:focus {
     border-color: var(--primary-color);
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+}
+
+/* Custom Select Styling */
+.cinematic-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.cinematic-select-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 1.25rem;
+    width: 0.8rem;
+    height: 0.8rem;
+    border-right: 2px solid var(--text-muted);
+    border-bottom: 2px solid var(--text-muted);
+    transform: rotate(45deg);
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.cinematic-select-wrapper:focus-within::after {
+    border-color: var(--primary-color);
+    transform: rotate(45deg) translateY(-2px) translateX(-2px);
+}
+
+select.cinematic-input {
+    appearance: none;
+    padding-right: 3rem;
+    cursor: pointer;
+}
+
+.cinematic-input {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid var(--surface-border) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px !important;
+    padding: 1rem 1.25rem !important;
+    font-weight: 500;
+}
+
+.cinematic-input:focus {
+    border-color: transparent !important;
+    background: linear-gradient(var(--bg-color), var(--bg-color)) padding-box,
+                linear-gradient(135deg, var(--primary-color), var(--accent-color)) border-box !important;
+    border: 1px solid transparent !important;
 }
 
 /* Glassmorphism */

@@ -502,25 +502,27 @@
             <form id="hireMeForm" style="display: flex; flex-direction: column; gap: 1.5rem;">
                 <div>
                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted);">Name *</label>
-                    <input type="text" id="hireName" placeholder="Your Name or Company" required>
+                    <input type="text" id="hireName" class="cinematic-input" placeholder="Your Name or Company" required>
                 </div>
                 <div>
                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted);">Email *</label>
-                    <input type="email" id="hireEmail" placeholder="you@example.com" required>
+                    <input type="email" id="hireEmail" class="cinematic-input" placeholder="you@example.com" required>
                 </div>
                 <div>
                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted);">Package *</label>
-                    <select id="hirePackage" style="width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--surface-border); border-radius: 8px; padding: 0.75rem 1rem; color: white; outline: none; appearance: none; cursor: pointer;">
-                        <option value="General Inquiry" style="background: var(--bg-color);">General Inquiry</option>
-                        <option value="Basic Edit" style="background: var(--bg-color);">Basic Edit ($49)</option>
-                        <option value="The Viral" style="background: var(--bg-color);">The Viral ($149)</option>
-                        <option value="The Elite" style="background: var(--bg-color);">The Elite ($299+)</option>
-                        <option value="Creator Package" style="background: var(--bg-color);">Monthly Creator Package ($1290/mo)</option>
-                    </select>
+                    <div class="cinematic-select-wrapper">
+                        <select id="hirePackage" class="cinematic-input" style="width: 100%;">
+                            <option value="General Inquiry" style="background: var(--bg-color);">General Inquiry</option>
+                            <option value="Basic Edit" style="background: var(--bg-color);">Basic Edit ($49)</option>
+                            <option value="The Viral" style="background: var(--bg-color);">The Viral ($149)</option>
+                            <option value="The Elite" style="background: var(--bg-color);">The Elite ($299+)</option>
+                            <option value="Creator Package" style="background: var(--bg-color);">Monthly Creator Package ($1290/mo)</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted);">Project Details *</label>
-                    <textarea id="hireMessage" placeholder="Tell me about your project, timeline, and goals..." rows="4" required></textarea>
+                    <textarea id="hireMessage" class="cinematic-input" placeholder="Tell me about your project, timeline, and goals..." rows="4" required></textarea>
                 </div>
 
                 <button type="submit" class="btn-primary" id="hireSubmitBtn"
