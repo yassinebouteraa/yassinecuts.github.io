@@ -213,18 +213,30 @@ textarea:focus {
 
 select.cinematic-input {
     appearance: none;
-    padding-right: 3rem;
+    -webkit-appearance: none;
+    padding-right: 3rem !important;
     cursor: pointer;
+    color: white !important;
+}
+
+/* Style the option tags explicitly for browser consistency */
+.cinematic-input option {
+    background-color: #1a1b1e !important;
+    color: white !important;
 }
 
 .cinematic-input {
-    background: rgba(255, 255, 255, 0.03) !important;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid var(--surface-border) !important;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 12px !important;
     padding: 1rem 1.25rem !important;
     font-weight: 500;
+    color: white !important;
+    outline: none;
+    transition: all 0.3s ease;
 }
 
 .cinematic-input:focus {
@@ -232,6 +244,7 @@ select.cinematic-input {
     background: linear-gradient(var(--bg-color), var(--bg-color)) padding-box,
                 linear-gradient(135deg, var(--primary-color), var(--accent-color)) border-box !important;
     border: 1px solid transparent !important;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
 }
 
 /* Glassmorphism */
