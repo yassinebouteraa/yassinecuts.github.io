@@ -314,28 +314,17 @@ select.cinematic-input {
     animation: fadeIn 0.3s ease-out;
 }
 
-/* Grid Layouts - Using CSS Grid for 3-column layout */
+/* Grid Layouts - Flexbox for robust uniform sizing */
 .video-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: 2rem;
     padding: 2rem 0;
-    align-items: start;
-}
-
-@media (max-width: 1024px) {
-    .video-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 640px) {
-    .video-grid {
-        grid-template-columns: 1fr;
-    }
 }
 
 .video-card {
+    /* 3 cards per row with 2rem gap between them */
+    flex: 0 0 calc(33.333% - 1.34rem);
     border-radius: 20px;
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -345,11 +334,24 @@ select.cinematic-input {
     flex-direction: column;
 }
 
+@media (max-width: 1024px) {
+    .video-card {
+        flex: 0 0 calc(50% - 1rem); /* 2 items per row */
+    }
+}
+
+@media (max-width: 640px) {
+    .video-card {
+        flex: 0 0 100%; /* 1 item per row */
+    }
+}
+
 .video-card:hover {
     transform: translateY(-8px) scale(1.02);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 102, 241, 0.2);
     border-color: var(--primary-color);
 }
+
 
 
 
