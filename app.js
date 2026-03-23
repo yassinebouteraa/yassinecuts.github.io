@@ -78,7 +78,29 @@ document.addEventListener("DOMContentLoaded", () => {
     loadState();
     initStatCounters();
     initCloudinary();
+    initScrollReveal();
 });
+
+function initScrollReveal() {
+    const revealCallback = (entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                // Optional: stop observing if you only want it to happen once
+                // observer.unobserve(entry.target);
+            }
+        });
+    };
+
+    const revealObserver = new IntersectionObserver(revealCallback, {
+        threshold: 0.15,
+        rootMargin: '0px 0px -50px 0px' // Trigger slightly before it hits the bottom
+    });
+
+    const revealElements = document.querySelectorAll('.reveal, .reveal-stagger');
+    revealElements.forEach(el => revealObserver.observe(el));
+}
+
 
 function initCloudinary() {
     const uploadBtn = document.getElementById('cloudinaryUploadBtn');
