@@ -86,20 +86,25 @@ function initScrollReveal() {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('active');
-                // Optional: stop observing if you only want it to happen once
-                // observer.unobserve(entry.target);
             }
         });
     };
 
     const revealObserver = new IntersectionObserver(revealCallback, {
-        threshold: 0.15,
-        rootMargin: '0px 0px -50px 0px' // Trigger slightly before it hits the bottom
+        threshold: 0.1,
+        rootMargin: '100px 0px -50px 0px' 
     });
 
-    const revealElements = document.querySelectorAll('.reveal, .reveal-stagger');
-    revealElements.forEach(el => revealObserver.observe(el));
+    const revealElements = document.querySelectorAll('.reveal');
+    revealElements.forEach(el => {
+        revealObserver.observe(el);
+        // Force check once on start
+        if (el.getBoundingClientRect().top < window.innerHeight) {
+            el.classList.add('active');
+        }
+    });
 }
+
 
 
 function initCloudinary() {

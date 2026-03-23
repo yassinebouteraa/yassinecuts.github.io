@@ -314,27 +314,28 @@ select.cinematic-input {
     animation: fadeIn 0.3s ease-out;
 }
 
-/* Grid Layouts */
-/* Grid Layouts - Updated to Horizontal Slider */
+/* Grid Layouts - Reverted to Masonry Grid upon User Request */
 .video-grid {
-    display: flex;
-    gap: 2rem;
+    column-count: 3;
+    column-gap: 2rem;
     padding: 2rem 0;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none; /* Hide scrollbar for cleaner look */
-    -ms-overflow-style: none;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 3rem; /* Space for hover effects */
 }
 
-.video-grid::-webkit-scrollbar {
-    display: none; /* Hide scrollbar for Chrome/Safari */
+@media (max-width: 1024px) {
+    .video-grid {
+        column-count: 2;
+    }
+}
+
+@media (max-width: 640px) {
+    .video-grid {
+        column-count: 1;
+    }
 }
 
 .video-card {
-    flex: 0 0 280px; /* More compact card size */
-    scroll-snap-align: start;
+    break-inside: avoid;
+    margin-bottom: 2rem;
     border-radius: 20px;
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -342,31 +343,14 @@ select.cinematic-input {
     border: 1px solid var(--surface-border);
     display: flex;
     flex-direction: column;
-    position: relative;
-    max-width: 90vw; /* Safety for smaller screens */
 }
-
-@media (max-width: 640px) {
-    .video-card {
-        flex: 0 0 85%; /* Shows a peek of the next video on mobile */
-    }
-}
-
 
 .video-card:hover {
-    transform: translateY(-12px) scale(1.02);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 20px rgba(99, 102, 241, 0.3);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 102, 241, 0.2);
     border-color: var(--primary-color);
-    z-index: 10;
 }
 
-
-/* Custom Premium Scrollbar for the Slider */
-.video-grid {
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary-color) rgba(255, 255, 255, 0.05);
-    padding-bottom: 2rem;
-}
 
 .video-grid::-webkit-scrollbar {
     display: block;
