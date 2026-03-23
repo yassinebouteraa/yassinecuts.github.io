@@ -314,28 +314,28 @@ select.cinematic-input {
     animation: fadeIn 0.3s ease-out;
 }
 
-/* Grid Layouts - Reverted to Masonry Grid upon User Request */
+/* Grid Layouts - Using CSS Grid for 3-column layout */
 .video-grid {
-    column-count: 3;
-    column-gap: 2rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
     padding: 2rem 0;
+    align-items: start;
 }
 
 @media (max-width: 1024px) {
     .video-grid {
-        column-count: 2;
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 640px) {
     .video-grid {
-        column-count: 1;
+        grid-template-columns: 1fr;
     }
 }
 
 .video-card {
-    break-inside: avoid;
-    margin-bottom: 2rem;
     border-radius: 20px;
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -351,26 +351,6 @@ select.cinematic-input {
     border-color: var(--primary-color);
 }
 
-
-.video-grid::-webkit-scrollbar {
-    display: block;
-    height: 6px;
-}
-
-.video-grid::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 10px;
-    margin: 0 2rem;
-}
-
-.video-grid::-webkit-scrollbar-thumb {
-    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-    border-radius: 10px;
-}
-
-.video-grid::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(90deg, var(--primary-hover), var(--accent-color));
-}
 
 
 .video-thumbnail-container {
