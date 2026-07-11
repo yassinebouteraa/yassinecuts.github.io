@@ -462,9 +462,13 @@ function toggleFullscreen(v) {
 
 function playYoutubeVideo(el, id, isShort) {
     const ratio = isShort ? 'padding-bottom: 177.77%;' : 'padding-bottom: 56.25%;';
+    const watchUrl = isShort ? `https://www.youtube.com/shorts/${id}` : `https://www.youtube.com/watch?v=${id}`;
     el.innerHTML = `
         <div style="position: relative; ${ratio} height: 0; overflow: hidden; width: 100%; border-radius: 12px;">
-            <iframe src="https://www.youtube.com/embed/${id}?autoplay=1&controls=1&rel=0&modestbranding=1&playsinline=1" style="position: absolute; top:0; left:0; width:100%; height:100%; border:none;" allowfullscreen autoplay playsinline></iframe>
+            <iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&controls=1&rel=0&modestbranding=1&playsinline=1" style="position: absolute; top:0; left:0; width:100%; height:100%; border:none;" allowfullscreen autoplay playsinline></iframe>
+            <a href="${watchUrl}" target="_blank" rel="noopener noreferrer" style="position: absolute; bottom: 0.75rem; right: 0.75rem; display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem; background: rgba(0,0,0,0.75); color: white; font-size: 0.75rem; font-weight: 600; border-radius: 8px; text-decoration: none; backdrop-filter: blur(4px);">
+                Watch on YouTube
+            </a>
         </div>
     `;
     el.style.aspectRatio = "unset";
