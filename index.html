@@ -47,7 +47,7 @@
                     <span>Hire Me</span>
                 </button>
 
-                <button class="btn-primary admin-only" onclick="openModal('uploadVideoModal')">
+                <button class="btn-primary admin-only" onclick="resetVideoForm(); openModal('uploadVideoModal')">
                     <i data-lucide="plus" style="width: 20px; height: 20px;"></i>
                     <span>Add Video</span>
                 </button>
@@ -109,7 +109,7 @@
                     </a>
 
                     <button class="btn-primary admin-only" style="padding: 1rem 2rem; font-size: 1.1rem;"
-                        onclick="openModal('uploadVideoModal')">
+                        onclick="resetVideoForm(); openModal('uploadVideoModal')">
                         <i data-lucide="upload-cloud" style="width: 24px; height: 24px;"></i>
                         <span>Upload New Work</span>
                     </button>
@@ -163,102 +163,13 @@
                 <p style="color: var(--text-muted);"><span id="videoCountText">0</span> items</p>
             </div>
 
-            <div id="videoGridContainer" class="video-grid">
+            <div id="videoGridContainer">
                 <!-- Videos will be injected here via JS -->
             </div>
 
             <div id="emptyVideoState" class="glass-panel" style="padding: 4rem; text-align: center; display: none;">
                 <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 1rem;">No videos added yet.</p>
                 <p class="admin-only">Click "Add Video" to start building your portfolio!</p>
-            </div>
-        </section>
-
-        <!-- PRICING PACKAGES -->
-        <section id="packages" class="container" style="padding-bottom: 6rem;">
-            <div style="text-align: center; margin-bottom: 3rem;">
-                <h3 style="font-size: 2.5rem; font-weight: 700;">Service <span class="text-gradient">Packages</span></h3>
-                <p style="color: var(--text-muted); margin-top: 0.5rem;">Choose the perfect fit for your content needs</p>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 4rem;">
-                <!-- Starter Package -->
-                <div class="glass-panel" style="padding: 2.5rem; transition: transform 0.3s ease; border: 1px solid var(--surface-border);" onmouseenter="this.style.transform='translateY(-10px)'" onmouseleave="this.style.transform='translateY(0)'">
-                    <h4 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Basic <span class="text-gradient">Edit</span></h4>
-                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">Perfect for simple, clean content</p>
-                    <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 2rem;">$49 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/video</span></div>
-                    
-                    <ul style="list-style: none; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
-                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Up to 60s Reel/Short</span></li>
-                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Basic Cuts</span></li>
-                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Motion Captions</span></li>
-                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Stock Music & SFX</span></li>
-                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>1 Revision</span></li>
-                    </ul>
-
-                    <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="selectPackage('Basic Edit')">Select Package</button>
-                </div>
-
-                <!-- Growth Package (Featured) -->
-                <div class="glass-panel" style="padding: 2.5rem; transform: scale(1.05); border: 2px solid var(--primary-color); position: relative; background: linear-gradient(180deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%);">
-                    <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary-color); color: white; padding: 0.25rem 1rem; border-radius: 99px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Most Popular</div>
-                    <h4 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">The <span class="text-gradient">Viral</span></h4>
-                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">Optimized for high retention</p>
-                    <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 2rem;">$149 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/video</span></div>
-                    
-                    <ul style="list-style: none; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
-                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Cinematic Storytelling</span></li>
-                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>High-Retention Editing</span></li>
-                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Advanced Hooks & VFX</span></li>
-                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Color Grading</span></li>
-                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Fast 48h Delivery</span></li>
-                    </ul>
-
-                    <button class="btn-primary" style="width: 100%; justify-content: center; background: linear-gradient(135deg, #4f46e5, #ec4899);" onclick="selectPackage('The Viral')">Select Package</button>
-                </div>
-
-                <!-- Pro Package -->
-                <div class="glass-panel" style="padding: 2.5rem; transition: transform 0.3s ease; border: 1px solid var(--surface-border);" onmouseenter="this.style.transform='translateY(-10px)'" onmouseleave="this.style.transform='translateY(0)'">
-                    <h4 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">The <span class="text-gradient">Elite</span></h4>
-                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">Full YouTube/Ads production</p>
-                    <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 2rem;">$299+</div>
-                    
-                    <ul style="list-style: none; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
-                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Long-form Content (10m+)</span></li>
-                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Unlimited Revisions</span></li>
-                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Dynamic Thumbnails</span></li>
-                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Strategy Consultation</span></li>
-                    </ul>
-
-                    <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="selectPackage('The Elite')">Select Package</button>
-                </div>
-            </div>
-
-            <!-- Monthly Packages Section -->
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <h4 style="font-size: 1.8rem; font-weight: 700;">Monthly <span class="text-gradient">Retainers</span></h4>
-                <p style="color: var(--text-muted); margin-top: 0.5rem;">Scale your brand with consistent, high-quality content</p>
-            </div>
-
-            <div style="max-width: 900px; margin: 0 auto;">
-                <div class="glass-panel" style="padding: 2.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem; background: linear-gradient(90deg, rgba(99, 102, 241, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%);">
-                    <div style="flex: 1; min-width: 250px;">
-                        <h5 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;">Creator <span class="text-gradient">Package</span></h5>
-                        <p style="color: var(--text-muted);">Master the algorithm with a steady flow of content.</p>
-                        <div style="display: flex; gap: 1.5rem; margin-top: 1.5rem; flex-wrap: wrap;">
-                            <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
-                                <i data-lucide="film" style="width: 20px; color: var(--primary-color);"></i> 12 Shorts / Month
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
-                                <i data-lucide="zap" style="width: 20px; color: var(--accent-color);"></i> Priority Delivery
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="text-align: right; min-width: 200px;">
-                        <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem;">$1290 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/mo</span></div>
-                        <button class="btn-primary" style="background: linear-gradient(135deg, #4f46e5, #ec4899);" onclick="selectPackage('Creator Package')">Get Access</button>
-                    </div>
-                </div>
             </div>
         </section>
 
@@ -292,6 +203,95 @@
                 <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 1rem;">No testimonials added yet.
                 </p>
                 <p class="admin-only">Click "Add Screenshot" to showcase your client feedback!</p>
+            </div>
+        </section>
+
+        <!-- PRICING PACKAGES -->
+        <section id="packages" class="container" style="padding-bottom: 6rem;">
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <h3 style="font-size: 2.5rem; font-weight: 700;">Service <span class="text-gradient">Packages</span></h3>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">Choose the perfect fit for your content needs</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 4rem;">
+                <!-- Starter Package -->
+                <div class="glass-panel" style="padding: 2.5rem; transition: transform 0.3s ease; border: 1px solid var(--surface-border);" onmouseenter="this.style.transform='translateY(-10px)'" onmouseleave="this.style.transform='translateY(0)'">
+                    <h4 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Basic <span class="text-gradient">Edit</span></h4>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">Perfect for simple, clean content</p>
+                    <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 2rem;">$49 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/video</span></div>
+
+                    <ul style="list-style: none; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Up to 60s Reel/Short</span></li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Basic Cuts</span></li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Motion Captions</span></li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Stock Music & SFX</span></li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>1 Revision</span></li>
+                    </ul>
+
+                    <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="selectPackage('Basic Edit')">Select Package</button>
+                </div>
+
+                <!-- Growth Package (Featured) -->
+                <div class="glass-panel" style="padding: 2.5rem; transform: scale(1.05); border: 2px solid var(--primary-color); position: relative; background: linear-gradient(180deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%);">
+                    <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary-color); color: white; padding: 0.25rem 1rem; border-radius: 99px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Most Popular</div>
+                    <h4 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">The <span class="text-gradient">Viral</span></h4>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">Optimized for high retention</p>
+                    <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 2rem;">$149 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/video</span></div>
+
+                    <ul style="list-style: none; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Cinematic Storytelling</span></li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>High-Retention Editing</span></li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Advanced Hooks & VFX</span></li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Color Grading</span></li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Fast 48h Delivery</span></li>
+                    </ul>
+
+                    <button class="btn-primary" style="width: 100%; justify-content: center; background: linear-gradient(135deg, #4f46e5, #ec4899);" onclick="selectPackage('The Viral')">Select Package</button>
+                </div>
+
+                <!-- Pro Package -->
+                <div class="glass-panel" style="padding: 2.5rem; transition: transform 0.3s ease; border: 1px solid var(--surface-border);" onmouseenter="this.style.transform='translateY(-10px)'" onmouseleave="this.style.transform='translateY(0)'">
+                    <h4 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">The <span class="text-gradient">Elite</span></h4>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">Full YouTube/Ads production</p>
+                    <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 2rem;">$299+</div>
+
+                    <ul style="list-style: none; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Long-form Content (10m+)</span></li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Unlimited Revisions</span></li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Dynamic Thumbnails</span></li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="check" style="width: 18px; color: var(--primary-color);"></i> <span>Strategy Consultation</span></li>
+                    </ul>
+
+                    <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="selectPackage('The Elite')">Select Package</button>
+                </div>
+            </div>
+
+            <!-- Monthly Packages Section -->
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h4 style="font-size: 1.8rem; font-weight: 700;">Monthly <span class="text-gradient">Retainers</span></h4>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">Scale your brand with consistent, high-quality content</p>
+            </div>
+
+            <div style="max-width: 900px; margin: 0 auto;">
+                <div class="glass-panel" style="padding: 2.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem; background: linear-gradient(90deg, rgba(99, 102, 241, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%);">
+                    <div style="flex: 1; min-width: 250px;">
+                        <h5 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;">Creator <span class="text-gradient">Package</span></h5>
+                        <p style="color: var(--text-muted);">Master the algorithm with a steady flow of content.</p>
+                        <div style="display: flex; gap: 1.5rem; margin-top: 1.5rem; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
+                                <i data-lucide="film" style="width: 20px; color: var(--primary-color);"></i> 12 Shorts / Month
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
+                                <i data-lucide="zap" style="width: 20px; color: var(--accent-color);"></i> Priority Delivery
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: right; min-width: 200px;">
+                        <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem;">$1290 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/mo</span></div>
+                        <button class="btn-primary" style="background: linear-gradient(135deg, #4f46e5, #ec4899);" onclick="selectPackage('Creator Package')">Get Access</button>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -382,7 +382,7 @@
     <div id="uploadVideoModal" class="modal-overlay" onclick="closeModals(event)">
         <div class="glass-panel modal-content" onclick="event.stopPropagation()">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                <h2 id="videoModalTitle" style="font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
                     <i data-lucide="film" class="text-gradient"></i> Add New Video
                 </h2>
                 <button class="btn-icon" onclick="closeModal('uploadVideoModal')">
@@ -391,6 +391,7 @@
             </div>
 
             <form id="videoUploadForm" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <input type="hidden" id="videoEditIdInput" value="">
                 <div>
                     <label
                         style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted);">Video URL (YouTube/Vimeo/Cloudinary)</label>
@@ -409,8 +410,24 @@
                 <div>
                     <label
                         style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted);">Project
-                        Title *</label>
-                    <input type="text" id="videoTitleInput" placeholder="e.g. Cinematic Showreel 2024" required>
+                        Title</label>
+                    <input type="text" id="videoTitleInput" placeholder="e.g. Cinematic Showreel 2024">
+                </div>
+
+                <div>
+                    <label
+                        style="display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted);">Editing
+                        Style</label>
+                    <div class="cinematic-select-wrapper">
+                        <select id="videoCategoryInput" class="cinematic-input" style="width: 100%;">
+                            <option value="Talking Head">Talking Head</option>
+                            <option value="E-commerce">E-commerce</option>
+                            <option value="Cinematic">Cinematic</option>
+                            <option value="Viral/Shorts">Viral/Shorts</option>
+                            <option value="UGC">UGC</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div>
@@ -419,7 +436,7 @@
                     <textarea id="videoDescInput" placeholder="Briefly describe the edit..." rows="3"></textarea>
                 </div>
 
-                <button type="submit" class="btn-primary"
+                <button type="submit" class="btn-primary" id="videoSubmitBtn"
                     style="width: 100%; justify-content: center; margin-top: 1rem;">
                     Upload to Database
                 </button>

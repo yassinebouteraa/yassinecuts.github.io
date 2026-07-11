@@ -190,23 +190,56 @@ function initStatCounters() {
 // ===================
 async function handleVideoFormSubmit(e) {
     if (e) e.preventDefault();
-    
+
     const videoUrl = document.getElementById('videoUrlInput').value;
     if (!videoUrl) {
         alert("Please enter a Video URL or upload via Cloudinary.");
         return;
     }
 
-    const title = document.getElementById('videoTitleInput').value || "New Edit";
+    const title = document.getElementById('videoTitleInput').value || "";
     const desc = document.getElementById('videoDescInput').value || "";
+    const category = document.getElementById('videoCategoryInput').value || "Other";
+    const editId = document.getElementById('videoEditIdInput').value;
 
-    await submitVideoToDB(videoUrl, title, desc);
+    if (editId) {
+        await updateVideoInDB(editId, videoUrl, title, desc, category);
+    } else {
+        await submitVideoToDB(videoUrl, title, desc, category);
+    }
 }
 
-async function submitVideoToDB(videoUrl, title, desc) {
+function resetVideoForm() {
+    document.getElementById('videoUploadForm').reset();
+    document.getElementById('videoEditIdInput').value = '';
+    document.getElementById('videoModalTitle').innerHTML = '<i data-lucide="film" class="text-gradient"></i> Add New Video';
+    document.getElementById('videoSubmitBtn').innerText = 'Upload to Database';
+    if (document.getElementById('cloudinaryStatus')) {
+        document.getElementById('cloudinaryStatus').style.display = 'none';
+    }
+    lucide.createIcons();
+}
+
+function openEditVideoModal(id) {
+    const video = state.videos.find(v => v.id === id);
+    if (!video) return;
+
+    document.getElementById('videoEditIdInput').value = id;
+    document.getElementById('videoUrlInput').value = video.video_url || video.videoUrl || '';
+    document.getElementById('videoTitleInput').value = video.title || '';
+    document.getElementById('videoDescInput').value = video.description || '';
+    document.getElementById('videoCategoryInput').value = video.category || 'Other';
+    document.getElementById('videoModalTitle').innerHTML = '<i data-lucide="pencil" class="text-gradient"></i> Replace Video';
+    document.getElementById('videoSubmitBtn').innerText = 'Save Changes';
+    lucide.createIcons();
+
+    openModal('uploadVideoModal');
+}
+
+async function submitVideoToDB(videoUrl, title, desc, category) {
     const { data, error } = await _supabase
         .from('videos')
-        .insert([{ title, description: desc, video_url: videoUrl }])
+        .insert([{ title, description: desc, video_url: videoUrl, category }])
         .select();
 
     if (error) {
@@ -215,10 +248,31 @@ async function submitVideoToDB(videoUrl, title, desc) {
     }
 
     state.videos.unshift(data[0]);
-    document.getElementById('videoUploadForm').reset();
-    if (document.getElementById('cloudinaryStatus')) {
-        document.getElementById('cloudinaryStatus').style.display = 'none';
+    resetVideoForm();
+    closeModal('uploadVideoModal');
+    renderApp();
+}
+
+async function updateVideoInDB(id, videoUrl, title, desc, category) {
+    const { data, error } = await _supabase
+        .from('videos')
+        .update({ title, description: desc, video_url: videoUrl, category })
+        .eq('id', id)
+        .select();
+
+    if (error) {
+        alert("Database error: " + error.message);
+        return;
     }
+
+    if (!data || data.length === 0) {
+        alert("Update was blocked (no rows returned). This is likely a Supabase Row Level Security policy preventing UPDATE access with the public key.");
+        return;
+    }
+
+    const index = state.videos.findIndex(v => v.id === id);
+    if (index !== -1) state.videos[index] = data[0];
+    resetVideoForm();
     closeModal('uploadVideoModal');
     renderApp();
 }
@@ -258,6 +312,70 @@ function renderApp() {
     lucide.createIcons();
 }
 
+const VIDEO_CATEGORY_ORDER = ['Talking Head', 'E-commerce', 'Cinematic', 'Viral/Shorts', 'UGC', 'Other'];
+
+function buildVideoCardHtml(video) {
+    const url = video.video_url || video.videoUrl;
+    const embedInfo = getEmbedInfo(url);
+    const isEmbed = embedInfo.type !== 'direct';
+
+    let thumbnailHtml = '';
+    if (embedInfo.type === 'youtube' || embedInfo.type === 'youtube-short') {
+        const isShort = embedInfo.type === 'youtube-short';
+        const aspectStyle = isShort ? 'aspect-ratio: 9/16;' : 'aspect-ratio: 16/9;';
+        thumbnailHtml = `
+            <div onclick="playYoutubeVideo(this, '${embedInfo.id}', ${isShort})" style="cursor: pointer; position: relative; width: 100%; display: flex; align-items: center; justify-content: center; background: #000; border-radius: 12px; overflow: hidden; ${aspectStyle}">
+                <img src="https://img.youtube.com/vi/${embedInfo.id}/maxresdefault.jpg" onerror="this.onerror=null; this.src='https://img.youtube.com/vi/${embedInfo.id}/0.jpg';" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.85;">
+                <div class="video-play-overlay">
+                    <div style="background: var(--primary-color); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(99,102, 241, 0.5);">
+                        <i data-lucide="play" fill="white" style="color:white; width: 28px; height: 28px;"></i>
+                    </div>
+                </div>
+            </div>
+        `;
+    } else if (embedInfo.type === 'vimeo') {
+        thumbnailHtml = `
+            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; width: 100%; border-radius: 12px;">
+                <iframe src="${embedInfo.url}" style="position: absolute; top:0; left:0; width:100%; height:100%; border:none;" allowfullscreen></iframe>
+            </div>
+        `;
+    } else {
+        thumbnailHtml = `
+            <div onclick="togglePlayVideo(this)">
+                <video src="${url}" class="video-element" loop></video>
+                <div class="video-play-overlay">
+                    <div style="background: var(--primary-color); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(99,102, 241, 0.5);">
+                        <i data-lucide="play" fill="white" style="color:white; width: 28px; height: 28px;"></i>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    const hasInfo = Boolean(video.title || video.description || state.isAdmin);
+
+    return `
+        <div class="video-card animate-fade-in">
+            <div class="video-thumbnail-container" style="position: relative;">
+                ${thumbnailHtml}
+                <div class="video-controls" style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem; opacity: 0; transition: opacity 0.2s; pointer-events: none;">
+                    ${!isEmbed ? `<button class="btn-icon" style="pointer-events: auto;" onclick="event.stopPropagation(); toggleFullscreen(this.parentElement.parentElement.querySelector('.video-element'))"><i data-lucide="maximize-2"></i></button>` : ''}
+                </div>
+            </div>
+            ${hasInfo ? `
+            <div class="video-info">
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        ${video.title ? `<h3 class="video-title">${video.title}</h3>` : ''}
+                        ${video.description ? `<p class="video-desc">${video.description}</p>` : ''}
+                    </div>
+                    ${state.isAdmin ? `<div style="display: flex; gap: 0.5rem;"><button class="btn-icon" onclick="openEditVideoModal('${video.id}')"><i data-lucide="pencil"></i></button><button class="btn-icon btn-icon-danger" onclick="deleteVideo('${video.id}', '${url}')"><i data-lucide="trash-2"></i></button></div>` : ''}
+                </div>
+            </div>` : ''}
+        </div>
+    `;
+}
+
 function renderVideos() {
     const container = document.getElementById('videoGridContainer');
     const emptyState = document.getElementById('emptyVideoState');
@@ -271,61 +389,23 @@ function renderVideos() {
     container.style.display = 'block';
     emptyState.style.display = 'none';
 
+    const grouped = {};
     state.videos.forEach(video => {
-        const url = video.video_url || video.videoUrl;
-        const embedInfo = getEmbedInfo(url);
-        const isEmbed = embedInfo.type !== 'direct';
+        if (!video) return;
+        const category = VIDEO_CATEGORY_ORDER.includes(video.category) ? video.category : 'Other';
+        if (!grouped[category]) grouped[category] = [];
+        grouped[category].push(video);
+    });
 
-        let thumbnailHtml = '';
-        if (embedInfo.type === 'youtube' || embedInfo.type === 'youtube-short') {
-            const isShort = embedInfo.type === 'youtube-short';
-            const aspectStyle = isShort ? 'aspect-ratio: 9/16;' : 'aspect-ratio: 16/9;';
-            thumbnailHtml = `
-                <div onclick="playYoutubeVideo(this, '${embedInfo.id}', ${isShort})" style="cursor: pointer; position: relative; width: 100%; display: flex; align-items: center; justify-content: center; background: #000; border-radius: 12px; overflow: hidden; ${aspectStyle}">
-                    <img src="https://img.youtube.com/vi/${embedInfo.id}/maxresdefault.jpg" onerror="this.onerror=null; this.src='https://img.youtube.com/vi/${embedInfo.id}/0.jpg';" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.85;">
-                    <div class="video-play-overlay">
-                        <div style="background: var(--primary-color); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(99,102, 241, 0.5);">
-                            <i data-lucide="play" fill="white" style="color:white; width: 28px; height: 28px;"></i>
-                        </div>
-                    </div>
-                </div>
-            `;
-        } else if (embedInfo.type === 'vimeo') {
-            thumbnailHtml = `
-                <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; width: 100%; border-radius: 12px;">
-                    <iframe src="${embedInfo.url}" style="position: absolute; top:0; left:0; width:100%; height:100%; border:none;" allowfullscreen></iframe>
-                </div>
-            `;
-        } else {
-            thumbnailHtml = `
-                <div onclick="togglePlayVideo(this)">
-                    <video src="${url}" class="video-element" loop></video>
-                    <div class="video-play-overlay">
-                        <div style="background: var(--primary-color); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(99,102, 241, 0.5);">
-                            <i data-lucide="play" fill="white" style="color:white; width: 28px; height: 28px;"></i>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
+    VIDEO_CATEGORY_ORDER.forEach(category => {
+        const videos = grouped[category];
+        if (!videos || videos.length === 0) return;
 
+        const cardsHtml = videos.map(buildVideoCardHtml).join('');
         container.insertAdjacentHTML('beforeend', `
-            <div class="video-card animate-fade-in">
-                <div class="video-thumbnail-container" style="position: relative;">
-                    ${thumbnailHtml}
-                    <div class="video-controls" style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem; opacity: 0; transition: opacity 0.2s; pointer-events: none;">
-                        ${!isEmbed ? `<button class="btn-icon" style="pointer-events: auto;" onclick="event.stopPropagation(); toggleFullscreen(this.parentElement.parentElement.querySelector('.video-element'))"><i data-lucide="maximize-2"></i></button>` : ''}
-                    </div>
-                </div>
-                <div class="video-info">
-                    <div style="display: flex; justify-content: space-between;">
-                        <div>
-                            <h3 class="video-title">${video.title}</h3>
-                            <p class="video-desc">${video.description}</p>
-                        </div>
-                        ${state.isAdmin ? `<button class="btn-icon btn-icon-danger" onclick="deleteVideo('${video.id}', '${url}')"><i data-lucide="trash-2"></i></button>` : ''}
-                    </div>
-                </div>
+            <div class="video-category-group" style="margin-bottom: 2.5rem;">
+                <h4 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-muted);">${category}</h4>
+                <div class="video-grid">${cardsHtml}</div>
             </div>
         `);
     });
