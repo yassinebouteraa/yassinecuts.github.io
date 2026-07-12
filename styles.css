@@ -589,6 +589,7 @@ main {
         z-index: 5;
         -webkit-mask-image: none;
         mask-image: none;
+        animation: heroFade 1s ease 0.25s both;
     }
 
     /* Hide corner labels + tagline (they clutter/overlap on small screens) */
