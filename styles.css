@@ -209,6 +209,111 @@ body {
     }
 }
 
+/* Hero V2 - Bold Editorial Layout */
+.hero-v2-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 3rem;
+    align-items: center;
+    text-align: left;
+}
+
+.hero-v2-eyebrow {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    border-radius: 99px;
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+.hero-v2-title {
+    font-size: 5.5rem;
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -2px;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+}
+
+.hero-v2-desc {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    max-width: 500px;
+    margin-bottom: 2.5rem;
+}
+
+.hero-v2-photo-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-v2-photo {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 3 / 4;
+    border-radius: 24px;
+    overflow: hidden;
+    background: linear-gradient(160deg, rgba(139, 92, 246, 0.25) 0%, rgba(0,0,0,0.6) 70%);
+    border: 1px solid var(--surface-border);
+    box-shadow: 0 20px 60px rgba(139, 92, 246, 0.25);
+}
+
+.hero-v2-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.hero-v2-photo-fallback {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    position: absolute;
+    inset: 0;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.85rem;
+}
+
+.hero-v2-photo-fallback code {
+    color: var(--primary-color);
+    font-size: 0.8rem;
+}
+
+@media (max-width: 900px) {
+    .hero-v2-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .hero-v2-title {
+        font-size: 3.2rem;
+    }
+
+    .hero-v2-desc {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-v2-photo-wrap {
+        order: -1;
+    }
+
+    .hero-v2-photo {
+        max-width: 320px;
+    }
+}
+
 /* Base Syntax */
 .container {
     max-width: 1200px;

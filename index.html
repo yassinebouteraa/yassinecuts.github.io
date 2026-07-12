@@ -74,47 +74,59 @@
 
     <main>
         <!-- HERO SECTION -->
-        <section class="container" style="padding-top: 6rem; padding-bottom: 4rem; text-align: center;">
+        <section class="container hero-v2" style="padding-top: 6rem; padding-bottom: 4rem;">
+            <div class="animate-fade-in hero-v2-grid">
+                <div class="hero-v2-copy">
+                    <div class="hero-v2-eyebrow">Freelance Video Editor & Motion Designer</div>
+
+                    <h2 class="hero-v2-title">
+                        Creative<br>
+                        <span class="text-gradient">Video</span><br>
+                        Editor
+                    </h2>
+
+                    <p class="hero-v2-desc">
+                        The difference between a scroll-past and a viral hit is in the edit. I craft cinematic,
+                        high-retention videos designed to hook instantly, grow your following, and turn viewers into
+                        paying clients.
+                    </p>
+
+                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                        <button class="btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem; background: linear-gradient(135deg, #4f46e5, #ec4899);"
+                            onclick="openModal('hireMeModal')">
+                            <i data-lucide="briefcase" style="width: 24px; height: 24px;"></i>
+                            <span>Hire Me</span>
+                        </button>
+
+                        <a href="#showreel"
+                            style="display: flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; font-weight: 600; font-size: 1.1rem; color: var(--text-main); border-bottom: 2px solid transparent; transition: border-color 0.2s; text-decoration: none;"
+                            onmouseenter="this.style.borderColor='var(--text-main)'"
+                            onmouseleave="this.style.borderColor='transparent'">
+                            <span>Unlock My Showreel</span>
+                            <i data-lucide="arrow-down" style="width: 20px; height: 20px;"></i>
+                        </a>
+
+                        <button class="btn-primary admin-only" style="padding: 1rem 2rem; font-size: 1.1rem;"
+                            onclick="resetVideoForm(); openModal('uploadVideoModal')">
+                            <i data-lucide="upload-cloud" style="width: 24px; height: 24px;"></i>
+                            <span>Upload New Work</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="hero-v2-photo-wrap">
+                    <div class="hero-v2-photo">
+                        <img src="./without bg.png" alt="Yassine Bouteraa"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="hero-v2-photo-fallback">
+                            <i data-lucide="user" style="width: 64px; height: 64px;"></i>
+                            <span>Cutout photo not found</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="animate-fade-in">
-                <div
-                    style="display: inline-block; padding: 0.5rem 1rem; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 99px; color: var(--primary-color); font-weight: 600; font-size: 0.875rem; margin-bottom: 1.5rem;">
-                    Freelance Video Editor & Motion Designer
-                </div>
-
-                <h2
-                    style="font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -1px;">
-                    Stop Letting Your <br />
-                    <span class="text-gradient">Competitors Steal Your Audience</span>
-                </h2>
-
-                <p style="font-size: 1.25rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 2.5rem;">
-                    The difference between a scroll-past and a viral hit is in the edit. I craft cinematic,
-                    high-retention videos designed to hook instantly, grow your following, and turn viewers into paying
-                    clients.
-                </p>
-
-                <div style="display: flex; gap: 1rem; justify-content: center; align-items: center; flex-wrap: wrap;">
-                    <button class="btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem; background: linear-gradient(135deg, #4f46e5, #ec4899);"
-                        onclick="openModal('hireMeModal')">
-                        <i data-lucide="briefcase" style="width: 24px; height: 24px;"></i>
-                        <span>Hire Me</span>
-                    </button>
-
-                    <a href="#showreel"
-                        style="display: flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; font-weight: 600; font-size: 1.1rem; color: var(--text-main); border-bottom: 2px solid transparent; transition: border-color 0.2s; text-decoration: none;"
-                        onmouseenter="this.style.borderColor='var(--text-main)'"
-                        onmouseleave="this.style.borderColor='transparent'">
-                        <span>Unlock My Showreel</span>
-                        <i data-lucide="arrow-down" style="width: 20px; height: 20px;"></i>
-                    </a>
-
-                    <button class="btn-primary admin-only" style="padding: 1rem 2rem; font-size: 1.1rem;"
-                        onclick="resetVideoForm(); openModal('uploadVideoModal')">
-                        <i data-lucide="upload-cloud" style="width: 24px; height: 24px;"></i>
-                        <span>Upload New Work</span>
-                    </button>
-                </div>
-
                 <!-- Stats Bar -->
                 <div id="statsBar" class="glass-panel"
                     style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 2rem; margin: 4rem auto 0; padding: 2.5rem; border-top: 1px solid rgba(99, 102, 241, 0.4); border-bottom: 1px solid rgba(236, 72, 153, 0.4); background: linear-gradient(90deg, rgba(99, 102, 241, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%);">
