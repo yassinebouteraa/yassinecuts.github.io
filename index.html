@@ -22,25 +22,21 @@
 <body>
 
     <!-- HEADER -->
-    <header class="glass-panel" style="position: sticky; top: 1rem; z-index: 50; margin: 1rem; padding: 1rem 2rem;">
+    <header class="site-header">
         <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 0;">
-            <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;" onclick="toggleAdmin()"
+            <div style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer;" onclick="toggleAdmin()"
                 title="Secret Admin Toggle">
-                <i data-lucide="play-square" style="color: var(--primary-color); width: 32px; height: 32px;"></i>
-                <h1 style="font-size: 1.5rem; font-weight: 700;">
+                <i data-lucide="play-square" style="color: var(--primary-color); width: 26px; height: 26px;"></i>
+                <h1 style="font-size: 1.25rem; font-weight: 700;">
                     Yassine<span class="text-gradient">Cuts</span>
                 </h1>
             </div>
 
-            <nav style="display: flex; align-items: center; gap: 2rem;">
-                <a href="#showreel" style="color: var(--text-main); font-weight: 500; text-decoration: none;"
-                    class="nav-link">Showreel</a>
-                <a href="#packages" style="color: var(--text-muted); font-weight: 500; text-decoration: none;"
-                    class="nav-link">Packages</a>
-                <a href="#testimonials" style="color: var(--text-muted); font-weight: 500; text-decoration: none;"
-                    class="nav-link">Testimonials</a>
-                <a href="#contact" style="color: var(--text-muted); font-weight: 500; text-decoration: none;"
-                    class="nav-link">Contact</a>
+            <nav style="display: flex; align-items: center; gap: 2.5rem;">
+                <a href="#showreel" class="nav-link">Showreel</a>
+                <a href="#packages" class="nav-link">Packages</a>
+                <a href="#testimonials" class="nav-link">Testimonials</a>
+                <a href="#contact" class="nav-link">Contact</a>
 
                 <button class="btn-primary" style="background: linear-gradient(135deg, #4f46e5, #ec4899);" onclick="openModal('hireMeModal')">
                     <i data-lucide="briefcase" style="width: 20px; height: 20px;"></i>
@@ -74,21 +70,32 @@
 
     <main>
         <!-- HERO SECTION -->
-        <section class="container hero-v2" style="padding-top: 6rem; padding-bottom: 4rem;">
-            <div class="animate-fade-in hero-v2-grid">
-                <div class="hero-v2-copy">
-                    <div class="hero-v2-eyebrow">Freelance Video Editor & Motion Designer</div>
+        <section class="hero-editorial">
+            <div class="hero-editorial-bg-text">PORTFOLIO</div>
 
-                    <h2 class="hero-v2-title">
-                        Creative<br>
-                        <span class="text-gradient">Video</span><br>
-                        Editor
+            <!-- Corner labels -->
+            <div class="hero-corner hero-corner-left">
+                <span class="hero-corner-title">VIDEO EDITOR</span>
+                <span class="hero-corner-sub">Content Creator</span>
+            </div>
+            <div class="hero-corner hero-corner-right">
+                <span class="hero-corner-title">AVAILABLE FOR FREELANCE</span>
+            </div>
+
+            <img class="hero-editorial-photo" src="./without bg.png" alt="Yassine Bouteraa"
+                onerror="this.style.display='none';">
+
+            <div class="hero-editorial-container">
+                <div class="hero-editorial-content">
+                    <p class="hero-editorial-greeting">Hello, I'm</p>
+                    <h2 class="hero-editorial-title">
+                        Yassine<br>Bouteraa
                     </h2>
+                    <p class="hero-editorial-role">Video Editor &amp;<br>Motion Designer</p>
 
-                    <p class="hero-v2-desc">
+                    <p class="hero-editorial-desc">
                         The difference between a scroll-past and a viral hit is in the edit. I craft cinematic,
-                        high-retention videos designed to hook instantly, grow your following, and turn viewers into
-                        paying clients.
+                        high-retention videos designed to hook instantly, grow your following, and turn viewers into paying clients.
                     </p>
 
                     <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
@@ -105,65 +112,44 @@
                             <span>Unlock My Showreel</span>
                             <i data-lucide="arrow-down" style="width: 20px; height: 20px;"></i>
                         </a>
-
-                        <button class="btn-primary admin-only" style="padding: 1rem 2rem; font-size: 1.1rem;"
-                            onclick="resetVideoForm(); openModal('uploadVideoModal')">
-                            <i data-lucide="upload-cloud" style="width: 24px; height: 24px;"></i>
-                            <span>Upload New Work</span>
-                        </button>
                     </div>
                 </div>
 
-                <div class="hero-v2-photo-wrap">
-                    <div class="hero-v2-photo">
-                        <img src="./without bg.png" alt="Yassine Bouteraa"
-                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="hero-v2-photo-fallback">
-                            <i data-lucide="user" style="width: 64px; height: 64px;"></i>
-                            <span>Cutout photo not found</span>
+                <div class="hero-editorial-stats">
+                    <div class="hero-accent-tagline">
+                        <div class="hero-accent-circle">
+                            <i data-lucide="sparkles" style="width: 20px; height: 20px;"></i>
                         </div>
+                        <p>Turning raw footage<br>into scroll-stopping<br>viral content.</p>
+                    </div>
+                    <div class="hero-editorial-stat">
+                        <span class="hero-editorial-stat-number">50+</span>
+                        <span class="hero-editorial-stat-label">Videos Edited</span>
+                    </div>
+                    <div class="hero-editorial-stat">
+                        <span class="hero-editorial-stat-number">10M+</span>
+                        <span class="hero-editorial-stat-label">Views Generated</span>
+                    </div>
+                    <div class="hero-editorial-stat">
+                        <span class="hero-editorial-stat-number">100%</span>
+                        <span class="hero-editorial-stat-label">Client Satisfaction</span>
                     </div>
                 </div>
             </div>
 
-            <div class="animate-fade-in">
-                <!-- Stats Bar -->
-                <div id="statsBar" class="glass-panel"
-                    style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 2rem; margin: 4rem auto 0; padding: 2.5rem; border-top: 1px solid rgba(99, 102, 241, 0.4); border-bottom: 1px solid rgba(236, 72, 153, 0.4); background: linear-gradient(90deg, rgba(99, 102, 241, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%);">
-                    <div style="flex: 1; min-width: 200px;">
-                        <h4 style="font-size: 3rem; font-weight: 800; line-height: 1;" class="text-gradient"><span
-                                class="stat-counter" data-target="50">0</span>+</h4>
-                        <p
-                            style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-top: 0.5rem;">
-                            Videos Edited</p>
-                    </div>
-                    <div
-                        style="flex: 1; min-width: 200px; border-left: 1px solid var(--surface-border); border-right: 1px solid var(--surface-border);">
-                        <h4 style="font-size: 3rem; font-weight: 800; line-height: 1;" class="text-gradient"><span
-                                class="stat-counter" data-target="10">0</span>M+</h4>
-                        <p
-                            style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-top: 0.5rem;">
-                            Views Generated</p>
-                    </div>
-                    <div style="flex: 1; min-width: 200px;">
-                        <h4 style="font-size: 3rem; font-weight: 800; line-height: 1;" class="text-gradient"><span
-                                class="stat-counter" data-target="100">0</span>%</h4>
-                        <p
-                            style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-top: 0.5rem;">
-                            Client Satisfaction</p>
-                    </div>
+            <!-- Tech Stack -->
+            <div id="techStack" class="hero-editorial-techstack">
+                <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-muted);">
+                    <i data-lucide="layers" style="width: 24px; height: 24px;"></i>
+                    <span style="font-weight: 600; letter-spacing: 1px; font-size: 0.9rem; text-transform: uppercase;">DaVinci Resolve</span>
                 </div>
-
-                <!-- Tech Stack -->
-                <div id="techStack" style="margin-top: 3rem; display: flex; justify-content: center; gap: 3rem; align-items: center; opacity: 0.8;">
-                    <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-muted);">
-                        <i data-lucide="layers" style="width: 24px; height: 24px;"></i>
-                        <span style="font-weight: 600; letter-spacing: 1px; font-size: 0.9rem; text-transform: uppercase;">DaVinci Resolve</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-muted);">
-                        <i data-lucide="cpu" style="width: 24px; height: 24px;"></i>
-                        <span style="font-weight: 600; letter-spacing: 1px; font-size: 0.9rem; text-transform: uppercase;">Premiere Pro</span>
-                    </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-muted);">
+                    <i data-lucide="cpu" style="width: 24px; height: 24px;"></i>
+                    <span style="font-weight: 600; letter-spacing: 1px; font-size: 0.9rem; text-transform: uppercase;">Premiere Pro</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-muted);">
+                    <i data-lucide="clapperboard" style="width: 24px; height: 24px;"></i>
+                    <span style="font-weight: 600; letter-spacing: 1px; font-size: 0.9rem; text-transform: uppercase;">After Effects</span>
                 </div>
             </div>
         </section>
