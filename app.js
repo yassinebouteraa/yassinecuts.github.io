@@ -81,22 +81,33 @@ document.addEventListener("DOMContentLoaded", () => {
     initScrollReveal();
 });
 
+const REVEAL_SELECTOR = '.reveal, .reveal-down, .reveal-left, .reveal-right, .reveal-fade, .reveal-scale, .reveal-stagger';
+
+let revealObserver = null;
+
 function initScrollReveal() {
     const revealCallback = (entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('active');
+                observer.unobserve(entry.target);
             }
         });
     };
 
-    const revealObserver = new IntersectionObserver(revealCallback, {
+    revealObserver = new IntersectionObserver(revealCallback, {
         threshold: 0.1,
-        rootMargin: '100px 0px -50px 0px' 
+        rootMargin: '100px 0px -50px 0px'
     });
 
-    const revealElements = document.querySelectorAll('.reveal');
+    observeRevealElements();
+}
+
+function observeRevealElements() {
+    if (!revealObserver) return;
+    const revealElements = document.querySelectorAll(REVEAL_SELECTOR);
     revealElements.forEach(el => {
+        if (el.classList.contains('active')) return;
         revealObserver.observe(el);
         // Force check once on start
         if (el.getBoundingClientRect().top < window.innerHeight) {
@@ -310,6 +321,7 @@ function renderApp() {
     renderVideos();
     renderTestimonials();
     lucide.createIcons();
+    observeRevealElements();
 }
 
 const VIDEO_CATEGORY_ORDER = ['Talking Head', 'E-commerce', 'Cinematic', 'Viral/Shorts', 'UGC', 'Other'];
@@ -403,7 +415,7 @@ function renderVideos() {
 
         const cardsHtml = videos.map(buildVideoCardHtml).join('');
         container.insertAdjacentHTML('beforeend', `
-            <div class="video-category-group" style="margin-bottom: 2.5rem;">
+            <div class="video-category-group reveal" style="margin-bottom: 2.5rem;">
                 <h4 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-muted);">${category}</h4>
                 <div class="video-grid">${cardsHtml}</div>
             </div>
@@ -425,7 +437,7 @@ function renderTestimonials() {
     state.testimonials.forEach(t => {
         const isAdminBtn = state.isAdmin ? `<div style="position: absolute; top: 1rem; right: 1rem;"><button class="btn-icon btn-icon-danger" onclick="deleteTestimonial('${t.id}')"><i data-lucide="trash-2"></i></button></div>` : '';
         let content = t.type === 'text' ? `<div style="padding: 2.5rem;"><p>"${t.text}"</p><p><strong>${t.name}</strong></p></div>` : `<img src="${t.image_url || t.imageUrl}" class="testimonial-img" />`;
-        container.insertAdjacentHTML('beforeend', `<div class="video-card" style="position: relative; height: 100%;">${content}${isAdminBtn}</div>`);
+        container.insertAdjacentHTML('beforeend', `<div class="video-card reveal-scale" style="position: relative; height: 100%;">${content}${isAdminBtn}</div>`);
     });
 }
 
