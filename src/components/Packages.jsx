@@ -5,6 +5,7 @@ import { useModal } from '../context/ModalContext.jsx';
 import { useMediaQuery } from '../hooks/useMediaQuery.js';
 import { Reveal, Stagger } from './motion/Reveal.jsx';
 import { TextReveal } from './motion/TextReveal.jsx';
+import { SectionKicker } from './motion/SectionKicker.jsx';
 import { MagneticButton } from './motion/MagneticButton.jsx';
 import { EASE } from './motion/variants.js';
 
@@ -73,6 +74,10 @@ export function Packages() {
 
   return (
     <section id="packages" className="container section">
+      <div className="section-glow section-glow-packages" aria-hidden="true" />
+
+      <SectionKicker index={4} total={5} label="Packages" centered />
+
       <Reveal className="stack-center" direction="down">
         <TextReveal as="h3" text="Service Packages" gradientFrom={1} />
         <p>Choose the perfect fit for your content needs</p>

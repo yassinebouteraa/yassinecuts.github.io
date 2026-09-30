@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { motion } from 'motion/react';
+import { Film } from 'lucide-react';
 
 import { usePortfolio } from '../context/PortfolioContext.jsx';
 import { useAdmin } from '../context/AdminContext.jsx';
@@ -7,6 +8,7 @@ import { VIDEO_CATEGORIES } from '../config.js';
 import { VideoCard } from './VideoCard.jsx';
 import { Reveal, Stagger } from './motion/Reveal.jsx';
 import { TextReveal } from './motion/TextReveal.jsx';
+import { SectionKicker } from './motion/SectionKicker.jsx';
 import { revealVariants } from './motion/variants.js';
 
 const cardVariants = revealVariants('up', { distance: 0.6, duration: 0.7 });
@@ -31,6 +33,8 @@ export function Showreel() {
 
   return (
     <section id="showreel" className="container section">
+      <SectionKicker index={2} total={5} label="Showreel" />
+
       <Reveal className="section-head">
         <TextReveal as="h3" className="section-title" text="Featured Edits" gradientFrom={1} />
         <p className="text-muted">{loading ? 'Loading…' : `${videos.length} items`}</p>
@@ -57,8 +61,11 @@ export function Showreel() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <p>No videos added yet.</p>
-          {isAdmin && <p className="text-muted">Click “Add Video” to start building your portfolio.</p>}
+          <div className="empty-state-icon">
+            <Film size={28} />
+          </div>
+          <p>Showreel loading soon</p>
+          <p>{isAdmin ? 'Click “Add Video” above to start building the grid.' : 'New edits are on the way — check back shortly.'}</p>
         </motion.div>
       )}
     </section>

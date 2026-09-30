@@ -1,11 +1,12 @@
 import { motion } from 'motion/react';
-import { MessageSquare, Plus, Trash2 } from 'lucide-react';
+import { MessageSquare, Plus, Quote, Trash2 } from 'lucide-react';
 
 import { useAdmin } from '../context/AdminContext.jsx';
 import { useModal } from '../context/ModalContext.jsx';
 import { usePortfolio } from '../context/PortfolioContext.jsx';
 import { Reveal, Stagger } from './motion/Reveal.jsx';
 import { TextReveal } from './motion/TextReveal.jsx';
+import { SectionKicker } from './motion/SectionKicker.jsx';
 import { TiltCard } from './motion/TiltCard.jsx';
 import { MagneticButton } from './motion/MagneticButton.jsx';
 import { revealVariants } from './motion/variants.js';
@@ -61,6 +62,10 @@ export function Testimonials() {
 
   return (
     <section id="testimonials" className="container section">
+      <div className="section-glow section-glow-testimonials" aria-hidden="true" />
+
+      <SectionKicker index={3} total={5} label="Testimonials" />
+
       <Reveal className="section-head">
         <TextReveal
           as="h3"
@@ -106,8 +111,11 @@ export function Testimonials() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <p>No testimonials added yet.</p>
-          {isAdmin && <p className="text-muted">Click “Add Screenshot” to showcase client feedback.</p>}
+          <div className="empty-state-icon">
+            <Quote size={28} />
+          </div>
+          <p>First reviews incoming</p>
+          <p>{isAdmin ? 'Click “Add Screenshot” above, or wait for a client to leave one.' : 'Be the first to leave a review above.'}</p>
         </motion.div>
       )}
     </section>

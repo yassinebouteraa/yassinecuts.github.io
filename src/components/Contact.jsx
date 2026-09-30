@@ -4,6 +4,7 @@ import { Briefcase, Instagram, MessageCircle, Phone } from 'lucide-react';
 
 import { useModal } from '../context/ModalContext.jsx';
 import { Reveal, Stagger } from './motion/Reveal.jsx';
+import { SectionKicker } from './motion/SectionKicker.jsx';
 import { MagneticButton } from './motion/MagneticButton.jsx';
 import { revealVariants } from './motion/variants.js';
 
@@ -40,6 +41,8 @@ export function Contact() {
 
   return (
     <section id="contact" className="container section" style={{ paddingTop: '2rem' }}>
+      <SectionKicker index={5} total={5} label="Contact" centered />
+
       <Reveal className="glass-panel contact-panel">
         <div className="pulse-glow contact-glow" />
 

@@ -4,6 +4,7 @@ import { ModalProvider } from './context/ModalContext.jsx';
 
 import { Header } from './components/Header.jsx';
 import { Hero } from './components/Hero.jsx';
+import { Craft } from './components/Craft.jsx';
 import { Showreel } from './components/Showreel.jsx';
 import { Testimonials } from './components/Testimonials.jsx';
 import { Packages } from './components/Packages.jsx';
@@ -12,18 +13,21 @@ import { ModalRoot } from './components/modals/ModalRoot.jsx';
 
 import { ScrollProgress } from './components/motion/ScrollProgress.jsx';
 import { CursorGlow } from './components/motion/CursorGlow.jsx';
+import { GrainOverlay } from './components/GrainOverlay.jsx';
 
 export default function App() {
   return (
     <AdminProvider>
       <PortfolioProvider>
         <ModalProvider>
+          <GrainOverlay />
           <ScrollProgress />
           <CursorGlow />
           <Header />
 
           <main>
             <Hero />
+            <Craft />
             <Showreel />
             <Testimonials />
             <Packages />

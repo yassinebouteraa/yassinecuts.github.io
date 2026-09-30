@@ -762,15 +762,8 @@ select.cinematic-input {
     gap: 1.5rem;
 }
 
-.empty-state {
-    padding: 4rem 2rem;
-    text-align: center;
-}
-
-.empty-state p {
-    font-size: 1.2rem;
-    color: var(--text-muted);
-}
+/* Full .empty-state styling lives in the EMPTY STATES block further down —
+   this section only needed the layout rules above it. */
 
 /* ============ GALLERY ============ */
 
@@ -1354,4 +1347,322 @@ select.cinematic-input {
         max-width: 100%;
         padding: 1.5rem;
     }
+}
+
+/* ============ GRAIN OVERLAY ============ */
+
+/* A tiled feTurbulence noise tile, subtle and blended over everything so the
+   whole page reads as cinematic film rather than a dark website with one
+   nice banner. Pure decoration: fixed, pointer-events: none, z-index above
+   all content but never intercepting clicks. */
+.grain-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+    animation: grainShift 1.1s steps(4) infinite;
+}
+
+@keyframes grainShift {
+    0%   { background-position: 0 0; }
+    25%  { background-position: -18px 9px; }
+    50%  { background-position: 12px -14px; }
+    75%  { background-position: -9px 16px; }
+    100% { background-position: 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .grain-overlay {
+        animation: none;
+    }
+}
+
+/* ============ SEQUENCE KICKER ============ */
+
+/* The small "02/05 — SHOWREEL" marker above a section heading. Reuses the
+   hero HUD's mono, wide-tracked, uppercase language so it reads as one
+   continuous system down the page. */
+.section-kicker {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: 1.1rem;
+}
+
+.section-kicker-index {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-main);
+    flex-shrink: 0;
+}
+
+.section-kicker-total {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.section-kicker-line {
+    flex: 1;
+    max-width: 4rem;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0));
+}
+
+.section-kicker-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* Explicit modifier rather than a parent-selector rule, so the kicker centers
+   correctly regardless of where it sits in the DOM relative to a heading. */
+.section-kicker-centered {
+    justify-content: center;
+    margin-bottom: 0.75rem;
+}
+
+.section-kicker-centered .section-kicker-line {
+    max-width: 2.5rem;
+}
+
+/* ============ CRAFT (3D SKILLS COVERFLOW) ============ */
+
+.craft-stage-wrap {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    padding: 3.5rem 1rem 2.5rem;
+    outline: none;
+}
+
+.craft-stage-wrap:focus-visible {
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.craft-glow {
+    position: absolute;
+    inset: -20% 10%;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse 55% 60% at 50% 45%, rgba(139, 92, 246, 0.16) 0%, rgba(236, 72, 153, 0.06) 45%, transparent 75%);
+    filter: blur(10px);
+}
+
+.craft-stage {
+    /* Generous height buffer: cards are absolutely positioned with auto
+       height, and if their content ever runs longer than expected there is
+       no vertical clip here — only .craft-stage-wrap clips (horizontally,
+       for the coverflow effect). This margin keeps that overflow from ever
+       visually reaching the controls row below. */
+    position: relative;
+    z-index: 1;
+    height: 420px;
+    perspective: 1400px;
+    perspective-origin: 50% 50%;
+}
+
+.craft-card {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 250px;
+    margin-left: -125px;
+    padding: 2rem 1.75rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.45);
+    transition: transform var(--craft-transition, 0.7s) cubic-bezier(0.22, 1, 0.36, 1),
+        opacity var(--craft-transition, 0.6s) ease;
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
+    cursor: pointer;
+}
+
+.craft-card-active {
+    cursor: default;
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+}
+
+.craft-card-index {
+    position: absolute;
+    top: 1.1rem;
+    right: 1.25rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.28);
+    font-variant-numeric: tabular-nums;
+}
+
+.craft-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    margin-bottom: 1.25rem;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.22), rgba(236, 72, 153, 0.14));
+    color: var(--text-main);
+}
+
+.craft-card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+}
+
+.craft-card-copy {
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+}
+
+.craft-controls {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+}
+
+.craft-readout {
+    font-size: 0.85rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+    color: var(--text-main);
+    min-width: 3.5rem;
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    .craft-stage-wrap {
+        padding: 2.5rem 0.5rem 2rem;
+    }
+
+    .craft-stage {
+        height: 400px;
+    }
+
+    .craft-card {
+        width: 210px;
+        margin-left: -105px;
+        padding: 1.6rem 1.4rem;
+    }
+
+    .craft-card-title {
+        font-size: 0.95rem;
+    }
+
+    .craft-card-copy {
+        font-size: 0.8rem;
+    }
+}
+
+/* ============ EMPTY STATES ============ */
+
+/* A deliberately "not broken, just not filled yet" placeholder for the
+   Showreel and Testimonials grids before real content is added — framed
+   like a piece of hardware, not a plain apology box. */
+.empty-state {
+    position: relative;
+    padding: 4rem 2rem;
+    text-align: center;
+    overflow: hidden;
+}
+
+.empty-state-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1.5rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px dashed rgba(255, 255, 255, 0.18);
+    color: var(--text-muted);
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.empty-state p + p {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
+/* A slow diagonal sheen sweeping across the panel — cheap, and reads as "a
+   monitor waiting for a signal" rather than an empty box. */
+.empty-state::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+    animation: emptyStateSheen 3.2s ease-in-out infinite;
+}
+
+@keyframes emptyStateSheen {
+    0%   { left: -60%; }
+    100% { left: 130%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .empty-state::after {
+        animation: none;
+        display: none;
+    }
+}
+
+/* ============ AMBIENT SECTION GLOW ============ */
+
+/* A soft blurred color pool behind a section's content, so the black canvas
+   between the hero and the footer never reads as flat. Purely additive: an
+   absolutely positioned pseudo-anchor placed once per section. */
+.section-glow {
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    filter: blur(12px);
+}
+
+.section-glow-packages {
+    inset: -4rem 15% auto 15%;
+    height: 26rem;
+    background: radial-gradient(ellipse 60% 100% at 50% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+}
+
+.section-glow-testimonials {
+    inset: -3rem 20% auto 20%;
+    height: 20rem;
+    background: radial-gradient(ellipse 55% 100% at 50% 0%, rgba(236, 72, 153, 0.09) 0%, transparent 70%);
+}
+
+/* Sections that host a glow need it positioned relative to themselves. */
+#packages,
+#testimonials {
+    position: relative;
 }
