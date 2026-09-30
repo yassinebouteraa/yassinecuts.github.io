@@ -9,6 +9,7 @@ import { VideoCard } from './VideoCard.jsx';
 import { Reveal, Stagger } from './motion/Reveal.jsx';
 import { TextReveal } from './motion/TextReveal.jsx';
 import { SectionKicker } from './motion/SectionKicker.jsx';
+import { ScrollFocus } from './motion/ScrollFocus.jsx';
 import { revealVariants } from './motion/variants.js';
 
 const cardVariants = revealVariants('up', { distance: 0.6, duration: 0.7 });
@@ -48,7 +49,9 @@ export function Showreel() {
 
           <Stagger className="video-grid" stagger={0.08}>
             {group.items.map((video) => (
-              <VideoCard key={video.id} video={video} variants={cardVariants} />
+              <ScrollFocus key={video.id} className="video-card-slot">
+                <VideoCard video={video} variants={cardVariants} />
+              </ScrollFocus>
             ))}
           </Stagger>
         </div>

@@ -776,6 +776,27 @@ select.cinematic-input {
 @media (max-width: 1024px) { .video-grid { column-count: 2; } }
 @media (max-width: 640px)  { .video-grid { column-count: 1; } }
 
+/* Outer scroll-parallax wrapper (ScrollFocus.jsx), used only in the Showreel
+   grid. Duplicates .video-card's column-layout properties rather than
+   relying on them propagating from the nested .video-card, since applying
+   `transform` to this element for the scroll effect makes margin-collapse
+   behaviour with its child uncertain across browsers — safer to just own the
+   spacing at the level that's actually the direct participant in the column
+   flow. .video-card itself keeps its own copies too, since it's shared with
+   the Testimonials grid, which isn't wrapped in .video-card-slot. */
+.video-card-slot {
+    break-inside: avoid;
+    margin-bottom: 2rem;
+}
+
+/* Whether that margin collapses through the transformed wrapper into this
+   child is genuinely ambiguous across browsers — rather than gamble on it
+   stacking to 4rem instead of 2rem, the inner card's own margin is zeroed
+   out here so the wrapper's is the only one that can ever apply. */
+.video-card-slot .video-card {
+    margin-bottom: 0;
+}
+
 .video-card {
     break-inside: avoid;
     margin-bottom: 2rem;
