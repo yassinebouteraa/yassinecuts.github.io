@@ -776,27 +776,6 @@ select.cinematic-input {
 @media (max-width: 1024px) { .video-grid { column-count: 2; } }
 @media (max-width: 640px)  { .video-grid { column-count: 1; } }
 
-/* Outer scroll-parallax wrapper (ScrollFocus.jsx), used only in the Showreel
-   grid. Duplicates .video-card's column-layout properties rather than
-   relying on them propagating from the nested .video-card, since applying
-   `transform` to this element for the scroll effect makes margin-collapse
-   behaviour with its child uncertain across browsers — safer to just own the
-   spacing at the level that's actually the direct participant in the column
-   flow. .video-card itself keeps its own copies too, since it's shared with
-   the Testimonials grid, which isn't wrapped in .video-card-slot. */
-.video-card-slot {
-    break-inside: avoid;
-    margin-bottom: 2rem;
-}
-
-/* Whether that margin collapses through the transformed wrapper into this
-   child is genuinely ambiguous across browsers — rather than gamble on it
-   stacking to 4rem instead of 2rem, the inner card's own margin is zeroed
-   out here so the wrapper's is the only one that can ever apply. */
-.video-card-slot .video-card {
-    margin-bottom: 0;
-}
-
 .video-card {
     break-inside: avoid;
     margin-bottom: 2rem;
@@ -1686,4 +1665,218 @@ select.cinematic-input {
 #packages,
 #testimonials {
     position: relative;
+}
+
+/* ============ TV SHOWREEL ============ */
+
+/* The tall track that the sticky TV rides inside. Its height is the entire
+   budget of scroll distance the channel-flipping experience gets — see
+   TvShowreel.jsx for how that's computed from the reel count. */
+.tv-track {
+    position: relative;
+}
+
+/* `top` uses max() so the TV clears the floating pill header (sticky at
+   top: 1.25rem, roughly 4.5–5rem tall) on both small phones (where 6vh could
+   be less than that) and tall desktop viewports (where a flat rem value
+   would sit too close to the header). */
+.tv-sticky {
+    position: sticky;
+    top: max(6.5rem, 9vh);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.1rem;
+    padding-bottom: 2rem;
+}
+
+.tv-shell {
+    position: relative;
+    width: min(92vw, 560px);
+    margin: 0 auto;
+    padding: 1.5rem 1.5rem 1.1rem;
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: linear-gradient(155deg, #1e1b24 0%, #0c0b0f 55%, #050507 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 40px 90px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* A pair of thin angled lines standing in for a rabbit-ear antenna. */
+.tv-antenna {
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    width: 70px;
+    height: 32px;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.tv-antenna span {
+    position: absolute;
+    bottom: 0;
+    width: 2px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.22);
+    transform-origin: bottom center;
+}
+
+.tv-antenna span:first-child {
+    left: 42%;
+    transform: rotate(-24deg);
+}
+
+.tv-antenna span:last-child {
+    left: 58%;
+    transform: rotate(24deg);
+}
+
+.tv-screen {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #000;
+    max-height: 58vh;
+    box-shadow:
+        0 0 0 2px rgba(99, 102, 241, 0.35),
+        0 0 34px rgba(139, 92, 246, 0.22),
+        inset 0 0 40px rgba(0, 0, 0, 0.85);
+}
+
+/* A brief brightness spike on channel change — an old-set "chunk" of static
+   rather than a clean crossfade. */
+.tv-screen-flash {
+    animation: tvFlash 0.22s ease-out;
+}
+
+@keyframes tvFlash {
+    0%   { filter: brightness(2.2) saturate(0.3); }
+    100% { filter: brightness(1) saturate(1); }
+}
+
+/* The power-on sweep. Scales from a thin horizontal line up to full height,
+   from the centre outward, the way an old CRT's picture unfolds. */
+.tv-power {
+    transform-origin: 50% 50%;
+}
+
+.tv-channel {
+    width: 100%;
+}
+
+/* The video card loses its own card chrome once it's inside the TV screen —
+   it reads as the screen's actual picture, not a bordered card sitting
+   inside another bordered frame. */
+.tv-channel .video-card {
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 0;
+}
+
+.tv-channel .video-card:hover {
+    box-shadow: none;
+}
+
+/* Faint scanlines over the whole screen, all the time. */
+.tv-screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.04) 0px,
+        rgba(255, 255, 255, 0.04) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+}
+
+/* The channel-change static burst — reuses the same feTurbulence tile as the
+   page-wide grain overlay, just briefly stronger and scoped to the screen. */
+.tv-static {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    opacity: 0.4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 140px 140px;
+}
+
+.tv-controls-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0 0.15rem;
+}
+
+.tv-speaker {
+    display: flex;
+    gap: 4px;
+    margin-right: auto;
+}
+
+.tv-speaker span {
+    width: 3px;
+    height: 20px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.tv-readout {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-main);
+}
+
+.tv-knob {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #3a3742, #14131a);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.tv-hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tv-screen-flash {
+        animation: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .tv-sticky {
+        top: max(5.5rem, 7vh);
+        gap: 0.85rem;
+    }
+
+    .tv-shell {
+        padding: 1.15rem 1rem 0.9rem;
+        border-radius: 24px;
+    }
+
+    .tv-antenna {
+        display: none;
+    }
+
+    .tv-screen {
+        max-height: 50vh;
+    }
 }

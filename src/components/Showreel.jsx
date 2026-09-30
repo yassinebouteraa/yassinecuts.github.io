@@ -5,21 +5,18 @@ import { Film } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext.jsx';
 import { useAdmin } from '../context/AdminContext.jsx';
 import { VIDEO_CATEGORIES } from '../config.js';
-import { VideoCard } from './VideoCard.jsx';
-import { Reveal, Stagger } from './motion/Reveal.jsx';
+import { TvShowreel } from './TvShowreel.jsx';
+import { Reveal } from './motion/Reveal.jsx';
 import { TextReveal } from './motion/TextReveal.jsx';
 import { SectionKicker } from './motion/SectionKicker.jsx';
-import { ScrollFocus } from './motion/ScrollFocus.jsx';
-import { revealVariants } from './motion/variants.js';
-
-const cardVariants = revealVariants('up', { distance: 0.6, duration: 0.7 });
 
 export function Showreel() {
   const { videos, loading } = usePortfolio();
   const { isAdmin } = useAdmin();
 
-  // Group into the fixed category order, dropping any category with no videos.
-  const groups = useMemo(() => {
+  // Flattened into the fixed category order, so the TV cycles through a
+  // stable, predictable sequence rather than raw database insert order.
+  const ordered = useMemo(() => {
     const byCategory = new Map(VIDEO_CATEGORIES.map((category) => [category, []]));
 
     videos.forEach((video) => {
@@ -27,9 +24,7 @@ export function Showreel() {
       byCategory.get(category).push(video);
     });
 
-    return VIDEO_CATEGORIES.map((category) => ({ category, items: byCategory.get(category) })).filter(
-      (group) => group.items.length > 0
-    );
+    return VIDEO_CATEGORIES.flatMap((category) => byCategory.get(category));
   }, [videos]);
 
   return (
@@ -41,23 +36,9 @@ export function Showreel() {
         <p className="text-muted">{loading ? 'Loading…' : `${videos.length} items`}</p>
       </Reveal>
 
-      {groups.map((group, index) => (
-        <div className="video-category-group" key={group.category}>
-          <Reveal as="h4" className="video-category-title" direction="left" distance={0.4} delay={index * 0.04}>
-            {group.category}
-          </Reveal>
+      {!loading && ordered.length > 0 && <TvShowreel videos={ordered} />}
 
-          <Stagger className="video-grid" stagger={0.08}>
-            {group.items.map((video) => (
-              <ScrollFocus key={video.id} className="video-card-slot">
-                <VideoCard video={video} variants={cardVariants} />
-              </ScrollFocus>
-            ))}
-          </Stagger>
-        </div>
-      ))}
-
-      {!loading && videos.length === 0 && (
+      {!loading && ordered.length === 0 && (
         <motion.div
           className="glass-panel empty-state"
           initial={{ opacity: 0, y: 20 }}
