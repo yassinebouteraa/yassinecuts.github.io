@@ -39,7 +39,7 @@ export function Header() {
     <>
       <motion.header
         className="site-header"
-        animate={{ y: hidden && !reduced ? '-110%' : '0%' }}
+        animate={{ y: hidden && !reduced ? '-180%' : '0%' }}
         transition={{ duration: 0.35, ease: EASE }}
       >
         <div className="container">

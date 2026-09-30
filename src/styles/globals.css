@@ -91,16 +91,26 @@ body {
 
 /* ============ HERO ============ */
 
-.hero-editorial {
+.hero {
     position: relative;
-    overflow: hidden;
     min-height: 100vh;
     display: flex;
     align-items: center;
+    justify-content: center;
+    overflow: hidden;
     background: #000;
+    text-align: center;
+    padding: 9rem 1.5rem 7rem;
 }
 
-/* Animated shard field (see HeroBackground.jsx), the lowest hero layer. */
+/* Solid black under the hero so nothing bleeds into the gallery */
+main {
+    position: relative;
+    background: #000;
+    z-index: 2;
+}
+
+/* Animated shard field (HeroBackground.jsx) — the whole hero visual. */
 .hero-shards {
     position: absolute;
     inset: 0;
@@ -108,388 +118,136 @@ body {
     pointer-events: none;
 }
 
-/* The gradients that used to sit on .hero-editorial now ride *above* the
-   shards, so the field still fades to black into the gallery and the copy
-   keeps its contrast. */
-.hero-scrim {
+/* Bottom fade only. The field stays fully visible and resolves into the black
+   of the gallery below rather than cutting off at a hard edge. */
+.hero-fade {
     position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background:
-        linear-gradient(to bottom, transparent 45%, #000 88%),
-        radial-gradient(ellipse at 60% 40%, rgba(139, 92, 246, 0.12) 0%, transparent 55%);
-}
-
-/* Solid black under the hero so no glow bleeds into the gallery */
-main {
-    position: relative;
-    background: #000;
-    z-index: 2;
-}
-
-/* Giant stretched wordmark across the top of the hero */
-.hero-editorial-bg-text {
-    position: absolute;
-    top: -5rem;
-    left: 50%;
-    font-size: clamp(4rem, 14.5vw, 17rem);
-    font-weight: 900;
-    letter-spacing: -0.05em;
-    text-transform: uppercase;
-    line-height: 0.9;
-    z-index: 2;
-    pointer-events: none;
-    white-space: nowrap;
-    text-align: center;
-    width: 100%;
-    background: linear-gradient(180deg, rgba(167, 139, 250, 0.45) 0%, rgba(236, 72, 153, 0.20) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-}
-
-/* Full-bleed photo, blended (no card), sits center-right over the wordmark.
-   The wrapper owns position and scroll parallax; the image owns its entrance,
-   so the two never fight over the same transform. */
-.hero-photo-wrap {
-    position: absolute;
-    bottom: -1rem;
-    left: 57%;
-    height: 100%;
-    max-height: 950px;
-    z-index: 5;
-    pointer-events: none;
-}
-
-.hero-editorial-photo {
-    display: block;
-    height: 100%;
-    width: auto;
-    object-fit: contain;
-    object-position: bottom center;
-    filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.6));
-    -webkit-mask-image: linear-gradient(to bottom, #000 60%, rgba(0, 0, 0, 0.7) 74%, rgba(0, 0, 0, 0.25) 86%, transparent 96%);
-    mask-image: linear-gradient(to bottom, #000 60%, rgba(0, 0, 0, 0.7) 74%, rgba(0, 0, 0, 0.25) 86%, transparent 96%);
-}
-
-.hero-editorial-container {
-    position: relative;
-    z-index: 10;
-    display: grid;
-    grid-template-columns: minmax(320px, 1fr) 1.4fr auto;
-    gap: 2rem;
-    align-items: end;
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 3rem 5rem;
-}
-
-.hero-editorial-content {
-    z-index: 12;
-    grid-column: 1;
-}
-
-.hero-editorial-greeting {
-    font-family: 'Caveat', cursive;
-    font-size: 1.7rem;
-    font-weight: 600;
-    color: var(--text-main);
-    margin-bottom: 0.15rem;
-    margin-top: 8rem;
-    line-height: 1;
-}
-
-.hero-editorial-title {
-    font-size: clamp(2rem, 3.2vw, 3.2rem);
-    font-weight: 800;
-    line-height: 0.9;
-    letter-spacing: -0.03em;
-    text-transform: uppercase;
-    color: var(--text-main);
-    margin-bottom: 0.75rem;
-}
-
-.hero-editorial-role {
-    font-size: clamp(0.9rem, 1.15vw, 1.1rem);
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.01em;
-    line-height: 1.1;
-    margin-bottom: 1.35rem;
-    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-}
-
-.hero-editorial-desc {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    max-width: 350px;
-    line-height: 1.6;
-    margin-bottom: 1.75rem;
-}
-
-.hero-editorial-cta {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.hero-showreel-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 2rem;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: var(--text-main);
-    border-bottom: 2px solid transparent;
-    transition: border-color 0.25s ease;
-}
-
-.hero-showreel-link:hover {
-    border-bottom-color: var(--text-main);
-}
-
-/* Clean stat list, no container */
-.hero-editorial-stats {
-    grid-column: 3;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    z-index: 12;
-    justify-self: end;
-    margin-right: -2.75rem;
-}
-
-.hero-editorial-stat {
-    text-align: right;
-}
-
-.hero-editorial-stat-number {
-    display: block;
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--primary-color);
-    line-height: 1;
-    margin-bottom: 0.2rem;
-}
-
-.hero-editorial-stat-label {
-    display: block;
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--text-muted);
-    font-weight: 600;
-}
-
-/* Tech stack row pinned near the bottom of the hero */
-.hero-editorial-techstack {
-    position: absolute;
-    bottom: 2.5rem;
     left: 0;
     right: 0;
-    z-index: 12;
-    display: flex;
-    justify-content: center;
-    gap: 3rem;
-    align-items: center;
-    opacity: 0.8;
+    bottom: 0;
+    height: 45%;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.75) 65%, #000 100%);
 }
 
-.hero-tech-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    color: var(--text-muted);
-}
-
-.hero-tech-item span {
-    font-weight: 600;
-    letter-spacing: 1px;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-}
-
-/* Corner labels */
-.hero-corner {
-    position: absolute;
-    top: 6.5rem;
-    z-index: 12;
+.hero-inner {
+    position: relative;
+    z-index: 10;
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+    align-items: center;
+    max-width: 880px;
+    width: 100%;
 }
 
-.hero-corner-left { left: 3rem; }
-
-.hero-corner-right {
-    right: 3rem;
-    text-align: right;
-    padding-top: 0.35rem;
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.35rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
-.hero-corner-right::before {
-    content: '';
-    position: absolute;
-    top: 0.6rem;
-    right: -1.5rem;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--accent-color);
-    box-shadow: 0 0 10px var(--accent-color);
-}
-
-.hero-corner-title {
-    font-size: 0.8rem;
+.hero-badge-chip {
+    background: #fff;
+    color: #000;
+    font-size: 0.68rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--primary-color);
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
 }
 
-.hero-corner-sub {
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+.hero-badge-label {
+    padding-right: 0.85rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.hero-headline {
+    margin-top: 1.75rem;
+    font-size: clamp(2.4rem, 6vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.03;
+    letter-spacing: -0.035em;
+    /* Width comes from .hero-inner (880px), which lands this on two balanced
+       lines at full size. A ch cap here would force it narrower than that. */
+    text-wrap: balance;
+}
+
+.hero-sub {
+    margin-top: 1.5rem;
+    max-width: 46ch;
+    font-size: 1.05rem;
+    line-height: 1.6;
     color: var(--text-muted);
 }
 
-/* Circular accent + tagline near stats */
-.hero-accent-tagline {
+.hero-actions {
     display: flex;
-    align-items: center;
-    gap: 0.85rem;
-    margin-bottom: 1rem;
-    text-align: left;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2.5rem;
 }
 
-.hero-accent-circle {
-    flex-shrink: 0;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 1px solid rgba(139, 92, 246, 0.5);
-    display: flex;
+/* Scoped to .hero-actions so these win over .btn-primary, which is defined
+   later in the file at the same specificity. */
+.hero-actions .hero-cta {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--primary-color);
-    background: rgba(139, 92, 246, 0.08);
+    gap: 0.6rem;
+    padding: 1rem 2rem;
+    border-radius: 999px;
+    font-size: 1.05rem;
+    font-weight: 600;
 }
 
-.hero-accent-tagline p {
-    font-size: 0.78rem;
-    line-height: 1.4;
-    color: var(--text-muted);
+.hero-actions .hero-cta-secondary {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: background 0.25s ease, border-color 0.25s ease;
 }
 
-@media (max-width: 1024px) {
-    .hero-editorial-container { grid-template-columns: 1fr auto; }
-    .hero-editorial-content { grid-column: 1; }
-    .hero-editorial-stats { grid-column: 2; }
-    /* Stays above the wordmark (z-index 2) now that the scrim occupies 1. */
-    .hero-photo-wrap { opacity: 0.35; z-index: 3; }
+.hero-actions .hero-cta-secondary:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.24);
 }
 
 @media (max-width: 768px) {
-    .hero-editorial {
-        min-height: auto;
-        padding: 6rem 0 3rem;
-        text-align: center;
-        display: block;
+    .hero {
+        min-height: 92vh;
+        padding: 7.5rem 1.25rem 5rem;
     }
 
-    .hero-editorial-bg-text {
-        top: 4rem;
-        font-size: 4.5rem;
-        letter-spacing: -0.04em;
+    .hero-headline {
+        max-width: 100%;
     }
 
-    /* Photo becomes an inline block at the top, no absolute positioning */
-    .hero-photo-wrap {
-        position: relative;
-        left: auto;
-        bottom: auto;
-        margin: 0 auto 1.5rem;
-        height: auto;
-        width: 70%;
-        max-width: 280px;
-        max-height: none;
-        opacity: 1;
-        z-index: 5;
+    .hero-sub {
+        font-size: 0.98rem;
     }
 
-    .hero-editorial-photo {
-        width: 100%;
-        height: auto;
-        -webkit-mask-image: none;
-        mask-image: none;
-    }
-
-    .hero-corner,
-    .hero-accent-tagline { display: none; }
-
-    .hero-editorial-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 0 1.5rem;
-        gap: 1.5rem;
-    }
-
-    .hero-editorial-content {
-        order: 2;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .hero-editorial-greeting { margin-top: 0; }
-    .hero-editorial-title { font-size: clamp(2.2rem, 10vw, 3rem); }
-
-    .hero-editorial-desc {
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .hero-editorial-cta { justify-content: center; }
-
-    .hero-editorial-stats {
-        order: 3;
-        flex-direction: row;
-        justify-content: center;
-        align-items: flex-start;
-        margin-right: 0;
-        gap: 1.75rem;
-        flex-wrap: wrap;
+    .hero-actions {
         width: 100%;
     }
 
-    .hero-editorial-stat { text-align: center; }
-
-    .hero-editorial-techstack {
-        position: relative;
-        bottom: auto;
-        margin-top: 2.5rem;
-        flex-wrap: wrap;
-        gap: 1.25rem;
+    .hero-actions .hero-cta {
+        flex: 1 1 auto;
     }
 }
 
-@media (max-width: 420px) {
-    .hero-editorial-bg-text { font-size: 3.2rem; }
-    .hero-photo-wrap { width: 80%; }
-    .hero-editorial-stats { gap: 1.25rem; }
-}
 
 /* ============ BASE ============ */
 
@@ -1161,22 +919,29 @@ select.cinematic-input {
 
 /* ============ HEADER & NAV ============ */
 
+/* Floating pill nav: the bar itself is transparent and only provides the
+   margin; the inner container is the visible pill. */
 .site-header {
     position: sticky;
-    top: 0;
+    top: 1.25rem;
     z-index: 50;
-    padding: 1.5rem 0;
-    background: linear-gradient(180deg, rgba(11, 12, 16, 0.85) 0%, rgba(11, 12, 16, 0) 100%);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    padding: 0 1.25rem;
+    background: none;
 }
 
 .site-header .container {
-    max-width: 1400px;
-    padding: 0 3rem;
+    max-width: 1080px;
+    padding: 0.55rem 0.55rem 0.55rem 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1.5rem;
+    border-radius: 999px;
+    background: rgba(18, 15, 23, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 10px 34px rgba(0, 0, 0, 0.4);
 }
 
 .brand {
@@ -1194,7 +959,7 @@ select.cinematic-input {
 .desktop-nav {
     display: flex;
     align-items: center;
-    gap: 2.5rem;
+    gap: 1.75rem;
 }
 
 .nav-link {
@@ -1300,7 +1065,12 @@ select.cinematic-input {
 @media (max-width: 991px) {
     .container { padding: 0 1.5rem; }
 
-    .site-header .container { padding: 0 1.5rem; }
+    .site-header { padding: 0 0.85rem; }
+
+    .site-header .container {
+        padding: 0.5rem 0.5rem 0.5rem 1.15rem;
+        gap: 0.75rem;
+    }
 
     .desktop-nav { display: none; }
 
