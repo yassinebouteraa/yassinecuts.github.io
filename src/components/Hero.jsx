@@ -4,6 +4,7 @@ import { ArrowDown, Briefcase, Clapperboard, Cpu, Layers, Sparkles } from 'lucid
 
 import { useModal } from '../context/ModalContext.jsx';
 import { useMediaQuery } from '../hooks/useMediaQuery.js';
+import { HeroBackground } from './HeroBackground.jsx';
 import { MagneticButton } from './motion/MagneticButton.jsx';
 import { CountUp } from './motion/CountUp.jsx';
 import { EASE } from './motion/variants.js';
@@ -61,6 +62,9 @@ export function Hero() {
 
   return (
     <section className="hero-editorial" ref={ref}>
+      <HeroBackground />
+      <div className="hero-scrim" aria-hidden="true" />
+
       <motion.div
         className="hero-editorial-bg-text"
         aria-hidden="true"

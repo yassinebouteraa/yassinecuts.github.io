@@ -97,10 +97,28 @@ body {
     min-height: 100vh;
     display: flex;
     align-items: center;
+    background: #000;
+}
+
+/* Animated shard field (see HeroBackground.jsx), the lowest hero layer. */
+.hero-shards {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* The gradients that used to sit on .hero-editorial now ride *above* the
+   shards, so the field still fades to black into the gallery and the copy
+   keeps its contrast. */
+.hero-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
     background:
         linear-gradient(to bottom, transparent 45%, #000 88%),
-        radial-gradient(ellipse at 60% 40%, rgba(139, 92, 246, 0.12) 0%, transparent 55%),
-        #000;
+        radial-gradient(ellipse at 60% 40%, rgba(139, 92, 246, 0.12) 0%, transparent 55%);
 }
 
 /* Solid black under the hero so no glow bleeds into the gallery */
@@ -120,7 +138,7 @@ main {
     letter-spacing: -0.05em;
     text-transform: uppercase;
     line-height: 0.9;
-    z-index: 1;
+    z-index: 2;
     pointer-events: none;
     white-space: nowrap;
     text-align: center;
@@ -377,7 +395,8 @@ main {
     .hero-editorial-container { grid-template-columns: 1fr auto; }
     .hero-editorial-content { grid-column: 1; }
     .hero-editorial-stats { grid-column: 2; }
-    .hero-photo-wrap { opacity: 0.35; z-index: 2; }
+    /* Stays above the wordmark (z-index 2) now that the scrim occupies 1. */
+    .hero-photo-wrap { opacity: 0.35; z-index: 3; }
 }
 
 @media (max-width: 768px) {
