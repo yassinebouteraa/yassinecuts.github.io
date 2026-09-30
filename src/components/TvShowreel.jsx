@@ -11,6 +11,25 @@ const VH_PER_REEL = 55;
 const MIN_TRACK_VH = 280;
 const MAX_TRACK_VH = 900;
 
+// Long enough for the multi-step colour distortion to actually register as a
+// glitch rather than a blink, short enough not to feel like a loading stall.
+const GLITCH_MS = 400;
+
+/**
+ * Fresh random tear-bars for each glitch, so the effect never repeats the
+ * same pattern twice — a glitch that plays identically every time reads as
+ * an animation, not a malfunction.
+ */
+function makeGlitchBars() {
+  return Array.from({ length: 3 }, (_, i) => ({
+    id: i,
+    top: 6 + Math.random() * 78,
+    height: 3 + Math.random() * 9,
+    offset: (Math.random() - 0.5) * 44,
+    tint: Math.random() > 0.5 ? 'rgba(255, 0, 140, 0.38)' : 'rgba(0, 225, 255, 0.32)',
+  }));
+}
+
 /**
  * Drives which reel is "on screen" from scroll position, without hijacking
  * the scroll itself. The track below is a tall, ordinary block; this just
@@ -44,19 +63,19 @@ export function TvShowreel({ videos }) {
   const index = Math.min(scrollIndex, total - 1);
   const activeVideo = videos[index];
 
-  // A brief "static" flash on every channel change — reusing the same grain
-  // texture that already runs across the whole page, just intensified for a
-  // moment, so it reads as an old TV's channel-change burst rather than a
-  // plain crossfade.
-  const [flashing, setFlashing] = useState(false);
+  // The channel-change glitch: colour distortion and signal jitter (CSS, via
+  // the .tv-glitching class) layered with a static burst and randomised
+  // magenta/cyan tear bars. Non-null only while a glitch is playing, so it
+  // doubles as both the "is glitching" flag and the bars' data.
+  const [glitch, setGlitch] = useState(null);
   const previousIndex = useRef(index);
 
   useEffect(() => {
     if (previousIndex.current === index) return;
     previousIndex.current = index;
     if (reduced) return undefined;
-    setFlashing(true);
-    const id = window.setTimeout(() => setFlashing(false), 220);
+    setGlitch(makeGlitchBars());
+    const id = window.setTimeout(() => setGlitch(null), GLITCH_MS);
     return () => window.clearTimeout(id);
   }, [index, reduced]);
 
@@ -71,7 +90,7 @@ export function TvShowreel({ videos }) {
             <span />
           </div>
 
-          <div className={`tv-screen${flashing ? ' tv-screen-flash' : ''}`}>
+          <div className={`tv-screen${glitch ? ' tv-glitching' : ''}`}>
             {/* The power-on sweep: fires once, the first time the TV scrolls
                 into view, independent of channel-changing afterward. */}
             <motion.div
@@ -94,7 +113,24 @@ export function TvShowreel({ videos }) {
                 </motion.div>
               </AnimatePresence>
 
-              {flashing && <div className="tv-static" aria-hidden="true" />}
+              {glitch && (
+                <>
+                  <div className="tv-static" aria-hidden="true" />
+                  {glitch.map((bar) => (
+                    <div
+                      key={bar.id}
+                      className="tv-glitch-bar"
+                      aria-hidden="true"
+                      style={{
+                        top: `${bar.top}%`,
+                        height: `${bar.height}%`,
+                        background: bar.tint,
+                        transform: `translateX(${bar.offset}px)`,
+                      }}
+                    />
+                  ))}
+                </>
+              )}
             </motion.div>
           </div>
 

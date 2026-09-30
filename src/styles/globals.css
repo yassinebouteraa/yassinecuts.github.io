@@ -1750,13 +1750,38 @@ select.cinematic-input {
 
 /* A brief brightness spike on channel change — an old-set "chunk" of static
    rather than a clean crossfade. */
-.tv-screen-flash {
-    animation: tvFlash 0.22s ease-out;
+/* Channel-change glitch. Both the colour distortion (filter) and the signal
+   jitter (transform) sit on .tv-screen deliberately: it's a plain div with no
+   Framer-controlled transforms, unlike .tv-power (which owns the power-on
+   scaleY) and .tv-channel (which owns the swap scale). A CSS keyframe writing
+   `transform` on either of those would wholesale replace the value Framer set
+   there, since transform isn't composable across sources. */
+.tv-glitching {
+    animation: tvGlitchShift 0.4s steps(9, end);
 }
 
-@keyframes tvFlash {
-    0%   { filter: brightness(2.2) saturate(0.3); }
-    100% { filter: brightness(1) saturate(1); }
+@keyframes tvGlitchShift {
+    0%,
+    100% { filter: none; transform: translateX(0); }
+    8%   { filter: hue-rotate(60deg) saturate(3.5) contrast(1.4); transform: translateX(-5px); }
+    16%  { filter: hue-rotate(-80deg) saturate(2.2) contrast(1.2); transform: translateX(4px); }
+    24%  { filter: hue-rotate(130deg) saturate(4) contrast(1.6); transform: translateX(-7px); }
+    32%  { filter: none; transform: translateX(2px); }
+    44%  { filter: hue-rotate(-45deg) saturate(2.8); transform: translateX(-3px); }
+    58%  { filter: hue-rotate(95deg) saturate(1.9) contrast(1.15); transform: translateX(3px); }
+    72%  { filter: none; transform: translateX(-1px); }
+    86%  { filter: hue-rotate(-20deg) saturate(1.4); transform: translateX(1px); }
+}
+
+/* Horizontal tear bars in the classic magenta/cyan glitch palette. Positions,
+   heights and offsets are randomised per glitch in TvShowreel.jsx. */
+.tv-glitch-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 5;
+    pointer-events: none;
+    mix-blend-mode: screen;
 }
 
 /* The power-on sweep. Scales from a thin horizontal line up to full height,
@@ -1856,7 +1881,7 @@ select.cinematic-input {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .tv-screen-flash {
+    .tv-glitching {
         animation: none;
     }
 }
