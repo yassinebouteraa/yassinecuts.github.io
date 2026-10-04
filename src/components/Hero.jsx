@@ -1,24 +1,32 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'motion/react';
 import { ArrowDown, Briefcase, Layers } from 'lucide-react';
 
 import { useModal } from '../context/ModalContext.jsx';
 import { useMediaQuery } from '../hooks/useMediaQuery.js';
-import { HeroBackground } from './HeroBackground.jsx';
 import { MagneticButton } from './motion/MagneticButton.jsx';
+import { PlayheadReveal } from './motion/PlayheadReveal.jsx';
 import { EASE } from './motion/variants.js';
 
 // Above the fold, so the hero animates on mount rather than on scroll.
-// Everything rises through the same curve, staged element by element.
-// With reduced motion the props drop out entirely and it renders static.
+// Everything rises out of a soft blur through the same curve, staged element
+// by element. With reduced motion the props drop out and it renders static.
 const rise = (delay, reduced, distance = 26) =>
   reduced
     ? {}
     : {
-        initial: { opacity: 0, y: distance },
-        animate: { opacity: 1, y: 0 },
+        initial: { opacity: 0, y: distance, filter: 'blur(10px)' },
+        animate: { opacity: 1, y: 0, filter: 'blur(0px)' },
         transition: { duration: 0.8, ease: EASE, delay },
       };
+
+// Corner, then which way it flies in from (x, y).
+const FOCUS_BRACKETS = [
+  ['tl', -1, -1],
+  ['tr', 1, -1],
+  ['bl', -1, 1],
+  ['br', 1, 1],
+];
 
 const STATS = [
   { value: '50+', label: 'Projects Edited' },
@@ -29,23 +37,47 @@ const STATS = [
 const TIMECODE_FPS = 24;
 const pad2 = (n) => String(n).padStart(2, '0');
 
-/** A fake-but-alive timecode readout for the HUD corner — pure set dressing. */
-function useTimecode(reduced) {
-  const [frameCount, setFrameCount] = useState(0);
+/**
+ * A fake-but-alive timecode readout for the HUD corner — pure set dressing.
+ *
+ * It ticks 24 times a second, so it writes straight into its own text node
+ * instead of going through React state: re-rendering the whole hero at
+ * 24fps was the single biggest idle cost on the page. It also stops while
+ * the hero is off-screen or the tab is hidden.
+ */
+function Timecode({ reduced }) {
+  const ref = useRef(null);
 
   useEffect(() => {
-    if (reduced) return undefined;
-    const id = window.setInterval(() => setFrameCount((f) => f + 1), 1000 / TIMECODE_FPS);
-    return () => window.clearInterval(id);
+    const el = ref.current;
+    if (reduced || !el) return undefined;
+    let frame = 0;
+    let id = 0;
+    const tick = () => {
+      frame += 1;
+      const totalSeconds = Math.floor(frame / TIMECODE_FPS);
+      el.textContent = `00:${pad2(Math.floor(totalSeconds / 60) % 60)}:${pad2(totalSeconds % 60)}:${pad2(frame % TIMECODE_FPS)}`;
+    };
+    const start = () => {
+      if (!id) id = window.setInterval(tick, 1000 / TIMECODE_FPS);
+    };
+    const stop = () => {
+      window.clearInterval(id);
+      id = 0;
+    };
+    const observer = new IntersectionObserver(([entry]) => (entry.isIntersecting ? start() : stop()));
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      stop();
+    };
   }, [reduced]);
 
-  if (reduced) return '00:00:00:00';
-
-  const totalSeconds = Math.floor(frameCount / TIMECODE_FPS);
-  const minutes = Math.floor(totalSeconds / 60) % 60;
-  const seconds = totalSeconds % 60;
-  const frames = frameCount % TIMECODE_FPS;
-  return `00:${pad2(minutes)}:${pad2(seconds)}:${pad2(frames)}`;
+  return (
+    <span ref={ref} className="hero-hud-text hero-hud-text-mono">
+      00:00:00:00
+    </span>
+  );
 }
 
 export function Hero() {
@@ -53,7 +85,6 @@ export function Hero() {
   const ref = useRef(null);
   const reduced = useReducedMotion();
   const isMobile = useMediaQuery('(max-width: 900px)');
-  const timecode = useTimecode(reduced);
 
   // The copy and the photo drift at slightly different rates as the shard
   // field scrolls past behind them — cheap parallax depth, text leads.
@@ -68,9 +99,7 @@ export function Hero() {
 
   return (
     <section className="hero" ref={ref}>
-      <HeroBackground />
       <div className="hero-scrim-left" aria-hidden="true" />
-      <div className="hero-fade" aria-hidden="true" />
 
       {/* Viewfinder HUD — the frame lines, brand mark and timecode readout
           that give the hero a camera-monitor feel rather than a plain banner. */}
@@ -80,7 +109,7 @@ export function Hero() {
           <span className="hero-hud-text">YB — VIDEO EDITOR</span>
         </motion.div>
         <motion.div className="hero-hud-corner hero-hud-corner-br" {...rise(0.1, reduced, 14)}>
-          <span className="hero-hud-text hero-hud-text-mono">{timecode}</span>
+          <Timecode reduced={reduced} />
           <span className="hero-hud-bracket" />
         </motion.div>
       </div>
@@ -95,11 +124,10 @@ export function Hero() {
             <span className="hero-badge-label">Available for freelance</span>
           </motion.div>
 
-          <motion.h1 className="hero-headline" {...rise(0.28, reduced)}>
-            Yassine
-            <br />
-            Bouteraa
-          </motion.h1>
+          {/* An editing playhead scrubs across the name and reveals it. */}
+          <h1 className="hero-headline">
+            <PlayheadReveal text={'Yassine\nBouteraa'} delay={0.35} duration={1.3} />
+          </h1>
 
           <motion.p className="hero-role" {...rise(0.4, reduced)}>
             Video Editor &amp; Motion Designer
@@ -114,7 +142,7 @@ export function Hero() {
           <motion.div className="hero-actions" {...rise(0.6, reduced)}>
             <MagneticButton
               className="btn-primary hero-cta"
-              style={{ background: 'linear-gradient(135deg, #4f46e5, #ec4899)' }}
+              style={{ background: 'linear-gradient(135deg, #e04a12, #ff8a50)' }}
               onClick={() => openModal('hire')}
             >
               <Briefcase size={20} />
@@ -129,13 +157,12 @@ export function Hero() {
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             >
               <span>See my work</span>
-              <motion.span
-                style={{ display: 'flex' }}
-                animate={reduced ? undefined : { y: [0, 4, 0] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-              >
+              {/* CSS keyframes, not a Framer loop: a JS-driven infinite bounce
+                  rewrote this style every frame and kept the whole page's
+                  style/layer pipeline busy while idle. */}
+              <span className="hero-cta-arrow">
                 <ArrowDown size={18} />
-              </motion.span>
+              </span>
             </motion.a>
           </motion.div>
 
@@ -164,12 +191,32 @@ export function Hero() {
             <div className="hero-photo-glow" aria-hidden="true" />
 
             <div className="hero-photo-frame">
-              <span className="hero-photo-bracket hero-photo-bracket-tl" />
-              <span className="hero-photo-bracket hero-photo-bracket-br" />
+              {/* Camera focus: four brackets fly in from wide, lock onto the
+                  subject and blink twice, then a REC light comes on. */}
+              {FOCUS_BRACKETS.map(([pos, sx, sy]) => (
+                <motion.span
+                  key={pos}
+                  className={`hero-photo-bracket hero-photo-bracket-${pos}`}
+                  initial={reduced ? undefined : { opacity: 0, x: sx * 46, y: sy * 46 }}
+                  animate={reduced ? undefined : { opacity: [0, 1, 0.25, 1, 0.25, 1], x: 0, y: 0 }}
+                  transition={{
+                    x: { duration: 0.7, ease: EASE, delay: 0.6 },
+                    y: { duration: 0.7, ease: EASE, delay: 0.6 },
+                    opacity: { duration: 1.3, delay: 0.6, times: [0, 0.3, 0.5, 0.65, 0.8, 1] },
+                  }}
+                />
+              ))}
+              <motion.span className="hero-rec" aria-hidden="true" {...rise(1.5, reduced, 8)}>
+                <i />
+                REC
+              </motion.span>
 
               <img
                 className="hero-photo-img"
-                src="/hero-cutout.png"
+                src="/hero-cutout.webp"
+                width="600"
+                height="600"
+                fetchPriority="high"
                 alt="Yassine Bouteraa"
                 onError={(event) => {
                   event.currentTarget.closest('.hero-photo').style.display = 'none';

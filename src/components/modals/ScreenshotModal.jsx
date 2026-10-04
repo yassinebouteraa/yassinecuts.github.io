@@ -63,7 +63,7 @@ export function ScreenshotModal({ onClose }) {
           <button
             type="button"
             className="btn-primary"
-            style={{ width: '100%', background: '#3448c5' }}
+            style={{ width: '100%', background: '#ff5a1f' }}
             onClick={handleCloudinaryUpload}
           >
             <UploadCloud size={18} />

@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Briefcase } from 'lucide-react';
 
 import { Modal } from './Modal.jsx';
-import { supabase } from '../../lib/supabase.js';
+import { getSupabase } from '../../lib/supabase.js';
 import { CONTACT_EMAIL, PACKAGE_OPTIONS } from '../../config.js';
 
 export function HireModal({ preselectedPackage, onClose }) {
@@ -46,6 +46,7 @@ export function HireModal({ preselectedPackage, onClose }) {
       // Belt and braces: keep a copy in Supabase. A failure here must not
       // make a successfully sent inquiry look like it failed.
       try {
+        const supabase = await getSupabase();
         await supabase.from('messages').insert([
           { name: form.name, email: form.email, package: form.package, message: form.message },
         ]);

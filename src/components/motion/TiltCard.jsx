@@ -44,7 +44,11 @@ export function TiltCard({
     py.set(0);
   }
 
-  const tiltStyle = reduced
+  // With tilt off (max 0 — e.g. a card that's the screen of a 3D device)
+  // the card must add NO 3D context of its own: a nested perspective /
+  // preserve-3d inside an already-rotated parent makes the browser route
+  // real clicks to the wrong layer.
+  const tiltStyle = reduced || max === 0
     ? style
     : { ...style, rotateX, rotateY, transformPerspective: 1000, transformStyle: 'preserve-3d' };
 

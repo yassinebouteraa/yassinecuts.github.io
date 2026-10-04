@@ -5,6 +5,7 @@ import { useModal } from '../context/ModalContext.jsx';
 import { useMediaQuery } from '../hooks/useMediaQuery.js';
 import { Reveal, Stagger } from './motion/Reveal.jsx';
 import { TextReveal } from './motion/TextReveal.jsx';
+import { ScrollWords } from './motion/ScrollWords.jsx';
 import { SectionKicker } from './motion/SectionKicker.jsx';
 import { MagneticButton } from './motion/MagneticButton.jsx';
 import { EASE } from './motion/variants.js';
@@ -80,7 +81,7 @@ export function Packages() {
 
       <Reveal className="stack-center" direction="down">
         <TextReveal as="h3" text="Service Packages" gradientFrom={1} />
-        <p>Choose the perfect fit for your content needs</p>
+        <ScrollWords text="Choose the perfect fit for your content needs" accent={['perfect']} />
       </Reveal>
 
       <Stagger className="package-grid" stagger={0.12}>
@@ -116,7 +117,7 @@ export function Packages() {
               className="btn-primary"
               style={
                 pkg.featured
-                  ? { width: '100%', background: 'linear-gradient(135deg, #4f46e5, #ec4899)' }
+                  ? { width: '100%', background: 'linear-gradient(135deg, #e04a12, #ff8a50)' }
                   : { width: '100%' }
               }
               strength={0.15}
@@ -161,7 +162,7 @@ export function Packages() {
             </div>
             <MagneticButton
               className="btn-primary"
-              style={{ background: 'linear-gradient(135deg, #4f46e5, #ec4899)' }}
+              style={{ background: 'linear-gradient(135deg, #e04a12, #ff8a50)' }}
               onClick={() => openModal('hire', { package: 'Creator Package' })}
             >
               Get Access

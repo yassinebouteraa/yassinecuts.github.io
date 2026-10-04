@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AnimatePresence, motion, useMotionValueEvent, useScroll, useReducedMotion } from 'motion/react';
-import { Briefcase, LogOut, Menu, Plus, PlaySquare, X } from 'lucide-react';
+import { Briefcase, LogOut, Menu, Plus, X } from 'lucide-react';
+import { Logo } from './Logo';
 
 import { useAdmin } from '../context/AdminContext.jsx';
 import { useModal } from '../context/ModalContext.jsx';
@@ -51,9 +52,9 @@ export function Header() {
             <motion.span
               whileHover={reduced ? undefined : { rotate: -12, scale: 1.12 }}
               transition={SPRING}
-              style={{ display: 'flex', color: 'var(--primary-color)' }}
+              style={{ display: 'flex', color: 'var(--brand-cream)' }}
             >
-              <PlaySquare size={26} />
+              <Logo size={28} />
             </motion.span>
             <h1>
               Yassine<span className="text-gradient">Cuts</span>
@@ -92,7 +93,7 @@ export function Header() {
 
             <MagneticButton
               className="btn-primary"
-              style={{ background: 'linear-gradient(135deg, #4f46e5, #ec4899)' }}
+              style={{ background: 'linear-gradient(135deg, #e04a12, #ff8a50)' }}
               onClick={() => openModal('hire')}
             >
               <Briefcase size={18} />

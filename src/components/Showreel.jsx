@@ -5,7 +5,9 @@ import { Film } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext.jsx';
 import { useAdmin } from '../context/AdminContext.jsx';
 import { VIDEO_CATEGORIES } from '../config.js';
-import { TvShowreel } from './TvShowreel.jsx';
+import { getEmbedInfo } from '../lib/embed.js';
+import { LaptopShowreel } from './LaptopShowreel.jsx';
+import { PhoneShowreel } from './PhoneShowreel.jsx';
 import { Reveal } from './motion/Reveal.jsx';
 import { TextReveal } from './motion/TextReveal.jsx';
 import { SectionKicker } from './motion/SectionKicker.jsx';
@@ -27,6 +29,15 @@ export function Showreel() {
     return VIDEO_CATEGORIES.flatMap((category) => byCategory.get(category));
   }, [videos]);
 
+  // Vertical reels play on the phone, everything else on the TV. Orientation
+  // comes from the URL: a YouTube /shorts/ link is the only format we can
+  // know is 9:16 without loading the video, so direct uploads and Vimeo
+  // links default to the TV.
+  const [vertical, horizontal] = useMemo(() => {
+    const isVertical = (video) => getEmbedInfo(video.video_url ?? video.videoUrl).type === 'youtube-short';
+    return [ordered.filter(isVertical), ordered.filter((video) => !isVertical(video))];
+  }, [ordered]);
+
   return (
     <section id="showreel" className="container section">
       <SectionKicker index={2} total={5} label="Showreel" />
@@ -36,7 +47,8 @@ export function Showreel() {
         <p className="text-muted">{loading ? 'Loading…' : `${videos.length} items`}</p>
       </Reveal>
 
-      {!loading && ordered.length > 0 && <TvShowreel videos={ordered} />}
+      {!loading && vertical.length > 0 && <PhoneShowreel videos={vertical} />}
+      {!loading && horizontal.length > 0 && <LaptopShowreel videos={horizontal} />}
 
       {!loading && ordered.length === 0 && (
         <motion.div

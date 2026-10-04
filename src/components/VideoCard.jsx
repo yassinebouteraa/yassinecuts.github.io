@@ -37,7 +37,12 @@ function PlayOverlay({ visible }) {
 }
 
 // `rest` carries the entrance variants handed down by the <Stagger> grid.
-export function VideoCard({ video, ...rest }) {
+// `flat` switches off the hover tilt/lift — used when the card is already the
+// screen of a 3D device (phone, TV), where a card tilting inside a rotating
+// object reads as a rendering bug, not an effect.
+// `onPlay` fires when the viewer starts the video, so a device can react
+// (the phone straightens up and fills the screen).
+export function VideoCard({ video, flat = false, onPlay, ...rest }) {
   const url = video.video_url ?? video.videoUrl;
   const embed = getEmbedInfo(url);
 
@@ -65,6 +70,7 @@ export function VideoCard({ video, ...rest }) {
     if (!element) return;
     if (element.paused) {
       element.play();
+      onPlay?.();
       setPlaying(true);
     } else {
       element.pause();
@@ -93,6 +99,8 @@ export function VideoCard({ video, ...rest }) {
   return (
     <TiltCard
       className="video-card"
+      max={flat ? 0 : undefined}
+      lift={flat ? 0 : undefined}
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
       {...rest}
@@ -102,15 +110,28 @@ export function VideoCard({ video, ...rest }) {
           <div
             className="video-poster"
             style={{ aspectRatio: isShort ? '9 / 16' : '16 / 9' }}
-            onClick={() => setEmbedStarted(true)}
+            onClick={() => {
+              setEmbedStarted(true);
+              onPlay?.();
+            }}
             role="button"
             tabIndex={0}
             onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') setEmbedStarted(true);
+              if (event.key === 'Enter' || event.key === ' ') {
+                setEmbedStarted(true);
+                onPlay?.();
+              }
             }}
           >
             <motion.img
-              src={`https://img.youtube.com/vi/${embed.id}/maxresdefault.jpg`}
+              // Shorts get YouTube's native vertical 1080x1920 frame (oar2);
+              // the default thumbnail is a 16:9 crop that looks zoomed-in
+              // and blurry once stretched onto a tall screen.
+              src={
+                isShort
+                  ? `https://i.ytimg.com/vi/${embed.id}/oar2.jpg`
+                  : `https://img.youtube.com/vi/${embed.id}/maxresdefault.jpg`
+              }
               alt={video.title || 'Video thumbnail'}
               loading="lazy"
               animate={reduced ? undefined : { scale: hovered ? 1.06 : 1 }}

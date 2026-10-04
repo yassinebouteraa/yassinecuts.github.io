@@ -1,5 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useReducedMotion } from 'motion/react';
+import { useRef, useState } from 'react';
+import {
+  motion,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from 'motion/react';
 import {
   AudioLines,
   Captions,
@@ -15,6 +21,7 @@ import { useMediaQuery } from '../hooks/useMediaQuery.js';
 import { Reveal } from './motion/Reveal.jsx';
 import { TextReveal } from './motion/TextReveal.jsx';
 import { SectionKicker } from './motion/SectionKicker.jsx';
+import { ScrollWords } from './motion/ScrollWords.jsx';
 
 const SKILLS = [
   {
@@ -50,7 +57,8 @@ const SKILLS = [
 ];
 
 const TOTAL = SKILLS.length;
-const AUTO_ADVANCE_MS = 4200;
+// Scroll distance (in viewport heights) spent on each card while pinned.
+const VH_PER_CARD = 55;
 
 // How far each layer sits from the active card. Desktop gets a deeper stack;
 // small screens collapse to a tighter, shallower peek so nothing clips badly
@@ -65,31 +73,45 @@ const LAYERS = {
   },
 };
 
-/** Shortest signed distance from `active` to `index` around a ring of `total`. */
-function ringOffset(index, active, total) {
-  let raw = index - active;
-  if (raw > total / 2) raw -= total;
-  if (raw < -total / 2) raw += total;
-  return raw;
-}
-
+/**
+ * The skills coverflow, pinned: the section holds the screen while scrolling
+ * turns the cards one by one, with an editing timeline underneath whose
+ * playhead and timecode follow the scroll. Arrows and keys still work;
+ * they scroll the page to the matching card so scroll stays the one source
+ * of truth.
+ */
 export function Craft() {
   const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const trackRef = useRef(null);
   const reduced = useReducedMotion();
   const isCompact = useMediaQuery('(max-width: 640px)');
 
   const layers = isCompact ? LAYERS.compact : LAYERS.full;
   const maxLayer = isCompact ? 1 : 2;
 
-  useEffect(() => {
-    if (reduced || paused) return undefined;
-    const id = window.setInterval(() => setActive((a) => (a + 1) % TOTAL), AUTO_ADVANCE_MS);
-    return () => window.clearInterval(id);
-  }, [reduced, paused]);
+  const { scrollYProgress } = useScroll({ target: trackRef, offset: ['start start', 'end end'] });
+  useMotionValueEvent(scrollYProgress, 'change', (v) => {
+    const next = Math.min(TOTAL - 1, Math.max(0, Math.floor(v * TOTAL)));
+    setActive((cur) => (cur === next ? cur : next));
+  });
+
+  // The playhead and timecode read straight off scroll, so they glide
+  // between cards instead of jumping.
+  const clamped = useTransform(scrollYProgress, (v) => Math.min(1, Math.max(0, v)));
+  const playheadLeft = useTransform(clamped, (v) => `${v * 100}%`);
+  const timecode = useTransform(clamped, (v) => {
+    const frames = Math.round(v * TOTAL * 4 * 24);
+    const sec = Math.floor(frames / 24);
+    return `00:00:${String(sec).padStart(2, '0')}:${String(frames % 24).padStart(2, '0')}`;
+  });
 
   function goTo(index) {
-    setActive(((index % TOTAL) + TOTAL) % TOTAL);
+    const target = Math.min(TOTAL - 1, Math.max(0, index));
+    const track = trackRef.current;
+    if (!track) return;
+    const top = track.getBoundingClientRect().top + window.scrollY;
+    const travel = track.offsetHeight - window.innerHeight;
+    window.scrollTo({ top: top + ((target + 0.5) / TOTAL) * travel, behavior: reduced ? 'auto' : 'smooth' });
   }
 
   function handleKeyDown(event) {
@@ -103,12 +125,21 @@ export function Craft() {
   }
 
   return (
-    <section id="craft" className="container section">
+    <section
+      id="craft"
+      ref={trackRef}
+      className="craft-track"
+      style={{ height: `calc(100vh + ${TOTAL * VH_PER_CARD}vh)` }}
+    >
+      <div className="craft-sticky container">
       <SectionKicker index={1} total={5} label="The Craft" centered />
 
-      <Reveal className="stack-center" style={{ marginBottom: '2.5rem' }}>
+      <Reveal className="stack-center craft-head">
         <TextReveal as="h3" text="Every edit, covered" gradientFrom={2} />
-        <p>Six disciplines, one deadline. Click a card or use the arrows to look around.</p>
+        <ScrollWords
+          text="Six disciplines, one deadline. Keep scrolling to flip through all of them."
+          accent={['one', 'deadline']}
+        />
       </Reveal>
 
       <div
@@ -118,17 +149,15 @@ export function Craft() {
         aria-label="Editing skills"
         tabIndex={0}
         onKeyDown={handleKeyDown}
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-        onFocus={() => setPaused(true)}
-        onBlur={() => setPaused(false)}
         style={{ '--craft-transition': reduced ? '0s' : '0.7s' }}
       >
         <div className="craft-glow" aria-hidden="true" />
 
+
         <div className="craft-stage">
           {SKILLS.map((skill, index) => {
-            const offset = ringOffset(index, active, TOTAL);
+            // Linear, not a ring: scroll runs one way, so nothing wraps around.
+            const offset = index - active;
             const abs = Math.abs(offset);
             const sign = Math.sign(offset);
             const isActive = offset === 0;
@@ -171,6 +200,23 @@ export function Craft() {
           })}
         </div>
 
+        {/* Editing timeline: one clip per skill, a playhead that follows the
+            scroll continuously, and a running timecode. */}
+        <div className="craft-timeline" aria-hidden="true">
+          <div className="craft-timeline-track">
+            {SKILLS.map((skill, i) => (
+              <span
+                key={skill.title}
+                className={`craft-clip${i === active ? ' is-active' : ''}${i < active ? ' is-done' : ''}`}
+              >
+                <em>{skill.title}</em>
+              </span>
+            ))}
+            <motion.span className="craft-playhead" style={{ left: playheadLeft }} />
+          </div>
+          <motion.span className="craft-timecode">{timecode}</motion.span>
+        </div>
+
         <div className="craft-controls">
           <button className="btn-icon" onClick={() => goTo(active - 1)} aria-label="Previous skill">
             <ChevronLeft size={18} />
@@ -185,6 +231,8 @@ export function Craft() {
             <ChevronRight size={18} />
           </button>
         </div>
+      </div>
+
       </div>
     </section>
   );

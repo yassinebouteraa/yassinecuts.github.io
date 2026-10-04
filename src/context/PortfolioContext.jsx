@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { supabase } from '../lib/supabase.js';
+import { getSupabase } from '../lib/supabase.js';
 
 const PortfolioContext = createContext(null);
 
@@ -14,6 +14,7 @@ export function PortfolioProvider({ children }) {
 
     (async () => {
       try {
+        const supabase = await getSupabase();
         const [videoRes, testimonialRes] = await Promise.all([
           supabase.from('videos').select('*').order('created_at', { ascending: false }),
           supabase.from('testimonials').select('*').order('created_at', { ascending: false }),
@@ -39,6 +40,7 @@ export function PortfolioProvider({ children }) {
   }, []);
 
   const addVideo = useCallback(async ({ title, description, videoUrl, category }) => {
+    const supabase = await getSupabase();
     const { data, error: insertError } = await supabase
       .from('videos')
       .insert([{ title, description, video_url: videoUrl, category }])
@@ -50,6 +52,7 @@ export function PortfolioProvider({ children }) {
   }, []);
 
   const updateVideo = useCallback(async (id, { title, description, videoUrl, category }) => {
+    const supabase = await getSupabase();
     const { data, error: updateError } = await supabase
       .from('videos')
       .update({ title, description, video_url: videoUrl, category })
@@ -68,6 +71,7 @@ export function PortfolioProvider({ children }) {
   }, []);
 
   const removeVideo = useCallback(async (id) => {
+    const supabase = await getSupabase();
     const previous = videos;
     setVideos((current) => current.filter((video) => video.id !== id));
 
@@ -79,6 +83,7 @@ export function PortfolioProvider({ children }) {
   }, [videos]);
 
   const addTestimonial = useCallback(async (payload) => {
+    const supabase = await getSupabase();
     const { data, error: insertError } = await supabase.from('testimonials').insert([payload]).select();
     if (insertError) throw insertError;
     setTestimonials((current) => [data[0], ...current]);
@@ -86,6 +91,7 @@ export function PortfolioProvider({ children }) {
   }, []);
 
   const removeTestimonial = useCallback(async (id) => {
+    const supabase = await getSupabase();
     const previous = testimonials;
     setTestimonials((current) => current.filter((item) => item.id !== id));
 

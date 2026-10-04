@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { supabase } from '../lib/supabase.js';
+import { getSupabase } from '../lib/supabase.js';
 
 const AdminContext = createContext(null);
 
@@ -14,29 +14,36 @@ export function AdminProvider({ children }) {
 
   useEffect(() => {
     let active = true;
+    let unsubscribe = () => {};
 
-    supabase.auth.getSession().then(({ data }) => {
+    getSupabase().then((supabase) => {
       if (!active) return;
-      setSession(data.session);
-      setChecking(false);
-    });
+      supabase.auth.getSession().then(({ data }) => {
+        if (!active) return;
+        setSession(data.session);
+        setChecking(false);
+      });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
+      const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+        setSession(nextSession);
+      });
+      unsubscribe = () => listener.subscription.unsubscribe();
     });
 
     return () => {
       active = false;
-      listener.subscription.unsubscribe();
+      unsubscribe();
     };
   }, []);
 
   const signIn = useCallback(async (email, password) => {
+    const supabase = await getSupabase();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
   }, []);
 
   const signOut = useCallback(async () => {
+    const supabase = await getSupabase();
     await supabase.auth.signOut();
   }, []);
 

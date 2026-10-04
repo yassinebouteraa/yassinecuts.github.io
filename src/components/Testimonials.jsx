@@ -10,6 +10,7 @@ import { SectionKicker } from './motion/SectionKicker.jsx';
 import { TiltCard } from './motion/TiltCard.jsx';
 import { MagneticButton } from './motion/MagneticButton.jsx';
 import { revealVariants } from './motion/variants.js';
+import { cloudinaryThumb } from '../lib/cloudinary.js';
 
 const cardVariants = revealVariants('scale', { duration: 0.7 });
 
@@ -38,9 +39,10 @@ function TestimonialCard({ item, ...rest }) {
       ) : (
         <img
           className="testimonial-img"
-          src={item.image_url ?? item.imageUrl}
+          src={cloudinaryThumb(item.image_url ?? item.imageUrl, 720)}
           alt={`Client review from ${item.name ?? 'a client'}`}
           loading="lazy"
+          decoding="async"
         />
       )}
 
