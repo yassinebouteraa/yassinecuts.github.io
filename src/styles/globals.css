@@ -1,0 +1,3119 @@
+/* Fonts are preloaded from index.html */
+
+:root {
+    --brand-orange: #FF5A1F;
+    --brand-black: #121014;
+    --brand-cream: #F1ECE4;
+    --bg-color: #121014;
+    --surface-color: rgba(255, 255, 255, 0.04);
+    --surface-border: rgba(255, 255, 255, 0.08);
+    --primary-color: #ff5a1f;
+    --primary-hover: #e04a12;
+    --text-main: #f1ece4;
+    --text-muted: #a39e96;
+    --accent-color: #ff8a50;
+
+    --glass-bg: rgba(18, 16, 20, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    line-height: 1.5;
+    overflow-x: hidden;
+}
+
+/* Ambient loops. Scroll-triggered motion lives in Framer Motion instead. */
+.avatar-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%   { transform: translateY(0px); }
+    50%  { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+}
+
+.pulse-glow {
+    animation: pulseGlow 4s ease-in-out infinite alternate;
+}
+
+@keyframes pulseGlow {
+    0%   { opacity: 0.5; transform: translateX(-50%) scale(0.9); }
+    100% { opacity: 1; transform: translateX(-50%) scale(1.1); }
+}
+
+/* Soft light trailing the cursor (mouse only, see CursorGlow.jsx) */
+.cursor-glow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 520px;
+    height: 520px;
+    margin: -260px 0 0 -260px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+    background: radial-gradient(circle, rgba(255, 90, 31, 0.13) 0%, rgba(255, 138, 80, 0.06) 40%, transparent 68%);
+    mix-blend-mode: screen;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+
+    body,
+    .avatar-float,
+    .pulse-glow {
+        animation: none !important;
+    }
+}
+
+/* ============ HERO ============ */
+
+.hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding: 8.5rem 1.5rem 5rem;
+}
+
+/* Transparent on purpose: the shard field is fixed behind the whole page
+   and every section sits on top of it. */
+main {
+    position: relative;
+    z-index: 2;
+}
+
+/* Film-stock backdrop (HeroBackground.jsx), fixed to the window so it stays
+   behind every section. Matched to the brand reference: warm amber wash
+   pouring down from the top, a glowing rim along its lower-left edge, a
+   near-black plum lower half, grain + dust on a canvas on top. Every glow
+   animates transform/opacity only, so it stays on the compositor. */
+.site-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse 75% 32% at 42% 0%, rgba(110, 48, 54, 0.55) 0%, rgba(70, 24, 44, 0.3) 55%, transparent 100%),
+        linear-gradient(180deg, #1c0619 0%, #180517 40%, #10040f 70%, #0a030a 100%);
+}
+
+.site-bg-glow,
+.site-bg-leak {
+    position: absolute;
+    border-radius: 50%;
+    will-change: transform, opacity;
+}
+
+/* The wash and its glowing rim are one huge circle centred far off-screen
+   to the top-left (fitted to three points on the reference's edge), so on
+   screen the rim reads as a long, shallow diagonal: in from the left edge
+   at ~40% height, rising toward the top-middle.
+
+   Both layers overscan the viewport by 15% so drifting never shows an edge;
+   the gradient centre is offset by the same 15% to compensate. */
+.site-bg-wash,
+.site-bg-leak {
+    left: -15vw;
+    top: -15vh;
+    width: 130vw;
+    height: 130vh;
+    border-radius: 0;
+    transform-origin: -30vw -129vh;
+}
+
+/* Inside the circle: tan-amber nearest the top-left, cooling through brown
+   and maroon as it approaches the rim. */
+.site-bg-wash {
+    background: radial-gradient(190vw 190vh at -30vw -129vh,
+        rgba(196, 132, 82, 1) 74%,
+        rgba(165, 100, 64, 0.92) 83%,
+        rgba(120, 52, 52, 0.75) 90%,
+        rgba(80, 26, 44, 0.6) 95%,
+        rgba(55, 14, 36, 0.4) 98%,
+        rgba(40, 10, 30, 0.2) 101%,
+        transparent 106%);
+    animation: bgWash 22s ease-in-out infinite alternate;
+}
+
+/* The rim itself: a thin hot band right on the circle's edge, fading out
+   as it climbs to the right, like the reference. */
+.site-bg-leak {
+    background: radial-gradient(190vw 190vh at -30vw -129vh,
+        transparent 93.4%,
+        rgba(200, 95, 55, 0.12) 95.2%,
+        rgba(205, 98, 58, 0.38) 96.6%,
+        rgba(228, 116, 68, 0.7) 97.8%,
+        rgba(244, 138, 88, 0.82) 98.8%,
+        rgba(236, 120, 72, 0.7) 99.8%,
+        rgba(200, 70, 35, 0.38) 100.9%,
+        rgba(160, 50, 30, 0.12) 102.2%,
+        transparent 103.6%);
+    -webkit-mask-image: linear-gradient(90deg, #000 10%, #000 26%, transparent 60%);
+    mask-image: linear-gradient(90deg, #000 10%, #000 26%, transparent 60%);
+    /* Softness is baked into the gradient stops above: a live blur filter
+       here was re-run by the GPU on a 130vw layer every single frame. */
+    animation: bgLeak 15s ease-in-out infinite alternate;
+}
+
+/* Where the rim enters from the left it blooms wider and hotter. */
+.site-bg-flare {
+    width: 34vw;
+    height: 26vh;
+    left: -14vw;
+    top: 26vh;
+    background: radial-gradient(closest-side,
+        rgba(236, 118, 62, 0.6) 0%,
+        rgba(200, 80, 40, 0.28) 50%,
+        transparent 100%);
+    transform: rotate(-14deg);
+    animation: bgFlare 11s ease-in-out infinite alternate;
+}
+
+@keyframes bgFlare {
+    0%   { transform: rotate(-14deg) translate(0, 0) scale(1);       opacity: 0.65; }
+    100% { transform: rotate(-12deg) translate(2vw, -1vh) scale(1.12); opacity: 1; }
+}
+
+/* Brightest spot, tucked into the top-left corner. */
+.site-bg-hotspot {
+    width: 75vw;
+    height: 60vh;
+    left: -22vw;
+    top: -28vh;
+    background: radial-gradient(closest-side,
+        rgba(214, 150, 96, 0.7) 0%,
+        rgba(190, 126, 78, 0.35) 55%,
+        transparent 100%);
+    animation: bgHotspot 17s ease-in-out infinite alternate;
+}
+
+/* Faint ember in the bottom-right corner. */
+.site-bg-corner {
+    width: 50vmax;
+    height: 40vmax;
+    right: -26vmax;
+    bottom: -22vmax;
+    background: radial-gradient(closest-side,
+        rgba(210, 82, 26, 0.75) 0%,
+        rgba(130, 42, 22, 0.35) 50%,
+        transparent 100%);
+    animation: bgCorner 26s ease-in-out infinite alternate;
+}
+
+.site-bg-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 90% 80% at 50% 45%, transparent 60%, rgba(6, 2, 6, 0.5) 100%);
+}
+
+.site-bg-grain {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+}
+
+@keyframes bgWash {
+    0%   { transform: rotate(-1.2deg); opacity: 0.88; }
+    50%  { transform: rotate(0.6deg);  opacity: 1; }
+    100% { transform: rotate(1.4deg);  opacity: 0.92; }
+}
+
+@keyframes bgHotspot {
+    0%   { transform: translate(0, 0) scale(1);         opacity: 0.75; }
+    100% { transform: translate(7vw, 3vh) scale(1.15);  opacity: 1; }
+}
+
+@keyframes bgLeak {
+    0%   { transform: rotate(-1.2deg); opacity: 0.7; }
+    30%  { transform: rotate(0deg);    opacity: 1; }
+    60%  { transform: rotate(0.5deg);  opacity: 0.8; }
+    100% { transform: rotate(1.4deg);  opacity: 1; }
+}
+
+@keyframes bgCorner {
+    0%   { transform: translate(0, 0) scale(1);           opacity: 0.7; }
+    100% { transform: translate(-5vmax, -4vmax) scale(1.15); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .site-bg-glow,
+    .site-bg-leak { animation: none; }
+}
+
+/* Fades in over the backdrop once past the hero (opacity is scroll-linked in
+   HeroBackground.jsx) — the light keeps moving, just quieter, so text and
+   videos below stay easy to read. */
+.site-bg-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Contrast pool for the text column. Only the left ~65% darkens; the shard
+   field stays fully visible around and behind the photo on the right. */
+.hero-scrim-left {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(100deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.5) 32%, transparent 66%);
+    /* The hero starts below the sticky header, so feather the top edge
+       instead of leaving a hard line across the backdrop. */
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 160px);
+    mask-image: linear-gradient(180deg, transparent 0, #000 160px);
+}
+
+/* ---- Viewfinder HUD: a hairline frame plus a brand mark and a ticking
+   timecode in opposite corners, like a camera monitor overlay. Set dressing
+   only, aria-hidden, and it never competes with the actual content. ---- */
+.hero-hud {
+    position: absolute;
+    inset: 1.75rem;
+    z-index: 4;
+    pointer-events: none;
+}
+
+.hero-hud-corner {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Each corner spans the full width and draws its own frame line after (or
+   before) the label, so the label sits on the backdrop with no masking box. */
+.hero-hud-corner-tl {
+    top: -0.55rem;
+    left: 0;
+    right: 0;
+}
+
+.hero-hud-corner-br {
+    bottom: -0.55rem;
+    left: 0;
+    right: 0;
+}
+
+.hero-hud-corner-tl::after,
+.hero-hud-corner-br::before {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.hero-hud-bracket {
+    width: 9px;
+    height: 9px;
+    border-top: 1.5px solid rgba(255, 255, 255, 0.55);
+    border-left: 1.5px solid rgba(255, 255, 255, 0.55);
+}
+
+.hero-hud-corner-br .hero-hud-bracket {
+    border-top: none;
+    border-left: none;
+    border-bottom: 1.5px solid rgba(255, 255, 255, 0.55);
+    border-right: 1.5px solid rgba(255, 255, 255, 0.55);
+}
+
+.hero-hud-text {
+    padding: 0 0.25rem;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(241, 236, 228, 0.6);
+}
+
+.hero-hud-text-mono {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.1em;
+}
+
+.hero-inner {
+    position: relative;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    align-items: center;
+    gap: 2.5rem;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.45rem 0.9rem 0.45rem 0.75rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.hero-badge-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #34d399;
+    box-shadow: 0 0 8px #34d399;
+    flex-shrink: 0;
+}
+
+.hero-badge-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--text-main);
+}
+
+.hero-headline {
+    margin-top: 1.5rem;
+    font-size: clamp(2.75rem, 5.6vw, 4.6rem);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+}
+
+.hero-role {
+    margin-top: 0.85rem;
+    font-size: clamp(1rem, 1.4vw, 1.25rem);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-sub {
+    margin-top: 1.25rem;
+    max-width: 42ch;
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--text-muted);
+}
+
+.hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2.25rem;
+}
+
+/* Scoped to .hero-actions so these win over .btn-primary, defined later at
+   the same specificity. */
+.hero-actions .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1rem 2rem;
+    border-radius: 999px;
+    font-size: 1.02rem;
+    font-weight: 600;
+}
+
+.hero-actions .hero-cta-secondary {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.hero-actions .hero-cta-secondary:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.24);
+}
+
+.hero-stats {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2.75rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    max-width: 26rem;
+}
+
+.hero-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.hero-stat-value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1;
+}
+
+.hero-stat-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* ---- Photo column ---- */
+
+.hero-photo {
+    justify-self: center;
+    width: 100%;
+    max-width: 420px;
+}
+
+/* Inner wrapper: owns the entrance animation and the actual layout, so the
+   outer .hero-photo can carry the scroll-parallax transform without the two
+   fighting over the same y value (see Hero.jsx). */
+.hero-photo-entrance {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+/* Ambient blob that seats the cutout into the shard field instead of it
+   looking pasted on top. */
+.hero-photo-glow {
+    position: absolute;
+    inset: -10% -25% -6%;
+    z-index: -1;
+    background: radial-gradient(ellipse 60% 55% at 50% 40%, rgba(255, 90, 31, 0.28) 0%, rgba(255, 138, 80, 0.1) 45%, transparent 72%);
+    filter: blur(6px);
+    pointer-events: none;
+}
+
+.hero-photo-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+}
+
+.hero-photo-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    filter: drop-shadow(0 25px 45px rgba(0, 0, 0, 0.55));
+    -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+}
+
+.hero-photo-bracket {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.hero-photo-bracket-tl {
+    top: -0.6rem;
+    left: -0.6rem;
+    border-top: 2px solid rgba(255, 255, 255, 0.45);
+    border-left: 2px solid rgba(255, 255, 255, 0.45);
+}
+
+.hero-photo-bracket-br {
+    bottom: 4.5rem;
+    right: -0.6rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.45);
+    border-right: 2px solid rgba(255, 255, 255, 0.45);
+}
+
+.hero-tools-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: -1.5rem;
+    padding: 0.7rem 1.1rem;
+    border-radius: 999px;
+    background: rgba(15, 13, 16, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-main);
+    z-index: 3;
+}
+
+.hero-tools-chip svg {
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+    .hero-inner {
+        grid-template-columns: 1fr;
+        gap: 2.75rem;
+        max-width: 480px;
+    }
+
+    .hero-content {
+        align-items: center;
+        text-align: center;
+        order: 2;
+    }
+
+    .hero-photo {
+        order: 1;
+        max-width: 280px;
+        margin: 0 auto;
+    }
+
+    .hero-sub {
+        max-width: 40ch;
+    }
+
+    .hero-actions,
+    .hero-stats {
+        justify-content: center;
+    }
+
+    .hero-stats {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero {
+        min-height: auto;
+        padding: 7rem 1.15rem 4rem;
+    }
+
+    .hero-hud {
+        inset: 1.15rem;
+    }
+
+    .hero-hud-text {
+        font-size: 0.56rem;
+    }
+
+    .hero-headline {
+        font-size: clamp(2.3rem, 9vw, 3rem);
+    }
+
+    .hero-actions {
+        width: 100%;
+    }
+
+    .hero-actions .hero-cta {
+        flex: 1 1 auto;
+    }
+
+    .hero-stats {
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-badge-dot {
+        box-shadow: none;
+    }
+}
+
+
+/* ============ BASE ============ */
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.section {
+    padding-bottom: 6rem;
+}
+
+.section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+button,
+a {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: inherit;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color), var(--primary-color));
+    background-size: 200% auto;
+    color: white;
+    padding: 0.75rem 1.75rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 15px rgba(255, 90, 31, 0.3);
+    transition: background-position 0.5s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-position: right center;
+    box-shadow: 0 6px 20px rgba(255, 90, 31, 0.5);
+}
+
+.btn-primary:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.btn-subtle {
+    background: var(--surface-color);
+    border: 1px solid var(--surface-border);
+    box-shadow: none;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--surface-color);
+    border: 1px solid var(--surface-border);
+    color: var(--text-main);
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-icon:hover { background: rgba(255, 255, 255, 0.1); }
+
+.btn-icon-danger:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ============ FORMS ============ */
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.field label {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: white;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 15px rgba(255, 90, 31, 0.2);
+}
+
+.cinematic-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.cinematic-select-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 1.25rem;
+    width: 0.8rem;
+    height: 0.8rem;
+    border-right: 2px solid var(--text-muted);
+    border-bottom: 2px solid var(--text-muted);
+    transform: rotate(45deg);
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.cinematic-select-wrapper:focus-within::after {
+    border-color: var(--primary-color);
+    transform: rotate(45deg) translateY(-2px) translateX(-2px);
+}
+
+select.cinematic-input {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 3rem !important;
+    cursor: pointer;
+    color: white !important;
+}
+
+.cinematic-input option {
+    background-color: #1a1b1e !important;
+    color: white !important;
+}
+
+.cinematic-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid var(--surface-border) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px !important;
+    padding: 1rem 1.25rem !important;
+    font-weight: 500;
+    color: white !important;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.cinematic-input:focus {
+    border-color: transparent !important;
+    background: linear-gradient(var(--bg-color), var(--bg-color)) padding-box,
+        linear-gradient(135deg, var(--primary-color), var(--accent-color)) border-box !important;
+    border: 1px solid transparent !important;
+    box-shadow: 0 0 20px rgba(255, 90, 31, 0.15);
+}
+
+.upload-dropzone {
+    text-align: center;
+    padding: 1rem;
+    border: 1px dashed var(--surface-border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.upload-dropzone p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.form-note {
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.form-note-success { color: #10b981; }
+.form-note-error { color: #ef4444; }
+
+/* ============ SURFACES ============ */
+
+.glass-panel {
+    background: var(--surface-color);
+    border: 1px solid var(--surface-border);
+    border-radius: 16px;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 500px;
+    padding: 2rem;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.modal-head h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Full .empty-state styling lives in the EMPTY STATES block further down —
+   this section only needed the layout rules above it. */
+
+/* ============ GALLERY ============ */
+
+.video-grid {
+    column-count: 3;
+    column-gap: 2rem;
+    padding: 2rem 0;
+}
+
+@media (max-width: 1024px) { .video-grid { column-count: 2; } }
+@media (max-width: 640px)  { .video-grid { column-count: 1; } }
+
+.video-card {
+    break-inside: avoid;
+    margin-bottom: 2rem;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--surface-color);
+    border: 1px solid var(--surface-border);
+    display: flex;
+    flex-direction: column;
+}
+
+.video-card:hover {
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.video-category-group {
+    margin-bottom: 2.5rem;
+}
+
+.video-category-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-muted);
+}
+
+.video-thumbnail-container {
+    position: relative;
+    width: 100%;
+    background: #000;
+    display: flex;
+}
+
+.video-element {
+    width: 100%;
+    height: auto;
+    max-height: 80vh;
+    object-fit: contain;
+    display: block;
+}
+
+.video-frame {
+    position: relative;
+    height: 0;
+    overflow: hidden;
+    width: 100%;
+    border-radius: 12px;
+}
+
+.video-frame iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.video-poster {
+    cursor: pointer;
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.video-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+}
+
+.video-play-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-play-button {
+    background: var(--primary-color);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(255, 90, 31, 0.5);
+    color: white;
+}
+
+.video-watch-link {
+    position: absolute;
+    bottom: 0.75rem;
+    right: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 8px;
+    backdrop-filter: blur(4px);
+}
+
+.video-actions {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 3;
+}
+
+.video-info {
+    padding: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.video-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.video-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ============ TESTIMONIALS ============ */
+
+.testimonial-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    background: #000;
+}
+
+.testimonial-text {
+    padding: 2.5rem;
+}
+
+.testimonial-text p:first-child {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+}
+
+.testimonial-delete {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 2;
+}
+
+/* ============ PACKAGES ============ */
+
+.package-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+    align-items: start;
+}
+
+.package-card {
+    padding: 2.5rem;
+    border: 1px solid var(--surface-border);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.package-card-featured {
+    border: 2px solid var(--primary-color);
+    position: relative;
+    background: linear-gradient(180deg, rgba(255, 90, 31, 0.05) 0%, transparent 100%);
+}
+
+.package-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 1rem;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.package-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.package-tagline {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+
+.package-price {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+}
+
+.package-price span {
+    font-size: 1rem;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.package-features {
+    list-style: none;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.package-features li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.package-features svg {
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.retainer-card {
+    padding: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 2rem;
+    background: linear-gradient(90deg, rgba(255, 90, 31, 0.05) 0%, rgba(255, 138, 80, 0.05) 100%);
+}
+
+.retainer-perks {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.retainer-perks div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+/* ============ CONTACT ============ */
+
+.contact-panel {
+    padding: 4rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.contact-glow {
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255, 90, 31, 0.15) 0%, transparent 60%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.contact-inner {
+    z-index: 1;
+    position: relative;
+    width: 100%;
+}
+
+.contact-avatar {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: var(--surface-color);
+    border: 3px solid var(--primary-color);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 30px rgba(255, 90, 31, 0.4);
+    margin: 0 auto 1.5rem;
+    position: relative;
+}
+
+.contact-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.contact-avatar-fallback {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    font-weight: bold;
+    color: white;
+}
+
+.contact-name {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.contact-blurb {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    max-width: 500px;
+    margin: 0 auto 2.5rem;
+}
+
+.contact-pills {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.contact-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    color: var(--text-main);
+    border-radius: 99px;
+    font-weight: 600;
+    transition: border-color 0.3s ease;
+}
+
+.contact-cta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 2.5rem;
+    color: var(--text-main);
+    border-radius: 99px;
+    background: linear-gradient(135deg, rgba(224, 74, 18, 0.2), rgba(255, 138, 80, 0.2));
+    border: 1px solid var(--primary-color);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* ============ HEADER & NAV ============ */
+
+/* Floating pill nav: the bar itself is transparent and only provides the
+   margin; the inner container is the visible pill. */
+.site-header {
+    position: sticky;
+    top: 1.25rem;
+    z-index: 50;
+    padding: 0 1.25rem;
+    background: none;
+}
+
+.site-header .container {
+    max-width: 1080px;
+    padding: 0.55rem 0.55rem 0.55rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    border-radius: 999px;
+    background: rgba(18, 16, 20, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 10px 34px rgba(0, 0, 0, 0.4);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+}
+
+.brand h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+}
+
+.nav-link {
+    position: relative;
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover { color: var(--text-main); }
+
+.nav-link-active { color: var(--text-main); }
+
+/* The sliding bar that follows the active section (see Header.jsx) */
+.nav-indicator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.55rem;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+}
+
+.mobile-menu-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--surface-color);
+    border: 1px solid var(--surface-border);
+    color: var(--text-main);
+}
+
+.mobile-nav {
+    position: fixed;
+    top: 5.5rem;
+    left: 1rem;
+    right: 1rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    z-index: 100;
+    transform-origin: top center;
+}
+
+.mobile-nav a {
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--text-main);
+}
+
+/* ============ UTILITIES ============ */
+
+.text-gradient {
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.text-muted { color: var(--text-muted); }
+
+.center-row {
+    display: flex;
+    justify-content: center;
+}
+
+.stack-center {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.stack-center h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.stack-center h4 {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.stack-center p {
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+}
+
+/* ============ MOBILE ============ */
+
+@media (max-width: 991px) {
+    .container { padding: 0 1.5rem; }
+
+    .site-header { padding: 0 0.85rem; }
+
+    .site-header .container {
+        padding: 0.5rem 0.5rem 0.5rem 1.15rem;
+        gap: 0.75rem;
+    }
+
+    .desktop-nav { display: none; }
+
+    .mobile-menu-btn { display: flex; }
+
+    .section-title { font-size: 1.6rem; }
+
+    .stack-center h3 { font-size: 2rem; }
+
+    .package-grid { grid-template-columns: 1fr; }
+
+    .package-card-featured { transform: none; }
+
+    .retainer-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .retainer-card > div { width: 100%; }
+
+    .retainer-perks { justify-content: center; }
+
+    .contact-panel { padding: 3rem 1.25rem; }
+
+    .contact-name { font-size: 2rem; }
+
+    .modal-content {
+        max-width: 100%;
+        padding: 1.5rem;
+    }
+}
+
+/* ============ SEQUENCE KICKER ============ */
+
+/* The small "02/05 — SHOWREEL" marker above a section heading. Reuses the
+   hero HUD's mono, wide-tracked, uppercase language so it reads as one
+   continuous system down the page. */
+.section-kicker {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: 1.1rem;
+}
+
+.section-kicker-index {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-main);
+    flex-shrink: 0;
+}
+
+.section-kicker-total {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.section-kicker-line {
+    flex: 1;
+    max-width: 4rem;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0));
+}
+
+.section-kicker-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* Explicit modifier rather than a parent-selector rule, so the kicker centers
+   correctly regardless of where it sits in the DOM relative to a heading. */
+.section-kicker-centered {
+    justify-content: center;
+    margin-bottom: 0.75rem;
+}
+
+.section-kicker-centered .section-kicker-line {
+    max-width: 2.5rem;
+}
+
+/* ============ CRAFT (3D SKILLS COVERFLOW) ============ */
+
+.craft-stage-wrap {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    padding: 3.5rem 1rem 2.5rem;
+    outline: none;
+}
+
+.craft-stage-wrap:focus-visible {
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.craft-glow {
+    position: absolute;
+    inset: -20% 10%;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse 55% 60% at 50% 45%, rgba(255, 90, 31, 0.16) 0%, rgba(255, 138, 80, 0.06) 45%, transparent 75%);
+    filter: blur(10px);
+}
+
+.craft-stage {
+    /* Generous height buffer: cards are absolutely positioned with auto
+       height, and if their content ever runs longer than expected there is
+       no vertical clip here — only .craft-stage-wrap clips (horizontally,
+       for the coverflow effect). This margin keeps that overflow from ever
+       visually reaching the controls row below. */
+    position: relative;
+    z-index: 1;
+    height: 420px;
+    perspective: 1400px;
+    perspective-origin: 50% 50%;
+}
+
+.craft-card {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 250px;
+    margin-left: -125px;
+    padding: 2rem 1.75rem;
+    border-radius: 20px;
+    background: rgba(28, 21, 29, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.45);
+    transition: transform var(--craft-transition, 0.7s) cubic-bezier(0.22, 1, 0.36, 1),
+        opacity var(--craft-transition, 0.6s) ease;
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
+    cursor: pointer;
+}
+
+.craft-card-active {
+    cursor: default;
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+}
+
+.craft-card-index {
+    position: absolute;
+    top: 1.1rem;
+    right: 1.25rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.28);
+    font-variant-numeric: tabular-nums;
+}
+
+.craft-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    margin-bottom: 1.25rem;
+    background: linear-gradient(135deg, rgba(255, 90, 31, 0.22), rgba(255, 138, 80, 0.14));
+    color: var(--text-main);
+}
+
+.craft-card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+}
+
+.craft-card-copy {
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+}
+
+.craft-controls {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+}
+
+.craft-readout {
+    font-size: 0.85rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+    color: var(--text-main);
+    min-width: 3.5rem;
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    .craft-stage-wrap {
+        padding: 2.5rem 0.5rem 2rem;
+    }
+
+    .craft-stage {
+        height: 400px;
+    }
+
+    .craft-card {
+        width: 210px;
+        margin-left: -105px;
+        padding: 1.6rem 1.4rem;
+    }
+
+    .craft-card-title {
+        font-size: 0.95rem;
+    }
+
+    .craft-card-copy {
+        font-size: 0.8rem;
+    }
+}
+
+/* ============ EMPTY STATES ============ */
+
+/* A deliberately "not broken, just not filled yet" placeholder for the
+   Showreel and Testimonials grids before real content is added — framed
+   like a piece of hardware, not a plain apology box. */
+.empty-state {
+    position: relative;
+    padding: 4rem 2rem;
+    text-align: center;
+    overflow: hidden;
+}
+
+.empty-state-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1.5rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px dashed rgba(255, 255, 255, 0.18);
+    color: var(--text-muted);
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.empty-state p + p {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
+/* A slow diagonal sheen sweeping across the panel — cheap, and reads as "a
+   monitor waiting for a signal" rather than an empty box. */
+.empty-state::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+    animation: emptyStateSheen 3.2s ease-in-out infinite;
+}
+
+@keyframes emptyStateSheen {
+    0%   { left: -60%; }
+    100% { left: 130%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .empty-state::after {
+        animation: none;
+        display: none;
+    }
+}
+
+/* ============ AMBIENT SECTION GLOW ============ */
+
+/* A soft blurred color pool behind a section's content, so the black canvas
+   between the hero and the footer never reads as flat. Purely additive: an
+   absolutely positioned pseudo-anchor placed once per section. */
+.section-glow {
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    filter: blur(12px);
+}
+
+.section-glow-packages {
+    inset: -4rem 15% auto 15%;
+    height: 26rem;
+    background: radial-gradient(ellipse 60% 100% at 50% 0%, rgba(255, 90, 31, 0.1) 0%, transparent 70%);
+}
+
+.section-glow-testimonials {
+    inset: -3rem 20% auto 20%;
+    height: 20rem;
+    background: radial-gradient(ellipse 55% 100% at 50% 0%, rgba(255, 138, 80, 0.09) 0%, transparent 70%);
+}
+
+/* Sections that host a glow need it positioned relative to themselves. */
+#packages,
+#testimonials {
+    position: relative;
+}
+
+/* ============ SHOWREEL DEVICES (shared) ============ */
+
+/* Inside a device screen the video card stops being a card: no border, no
+   rounded chrome, and it fills the screen edge to edge. Its title/admin row
+   becomes a lower-third caption over the picture instead of a strip below. */
+.phone-channel .video-card,
+.laptop-channel .video-card {
+    position: relative;
+    height: 100%;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    background: #000;
+}
+
+.phone-channel .video-card:hover,
+.laptop-channel .video-card:hover {
+    box-shadow: none;
+}
+
+.phone-channel .video-thumbnail-container,
+.laptop-channel .video-thumbnail-container {
+    height: 100%;
+}
+
+.phone-channel .video-poster img,
+.laptop-channel .video-poster img {
+    opacity: 1;
+}
+
+/* !important because VideoCard sets these inline for the grid layout. */
+.phone-channel .video-poster,
+.laptop-channel .video-poster {
+    height: 100%;
+    aspect-ratio: auto !important;
+    border-radius: 0;
+}
+
+.phone-channel .video-frame,
+.laptop-channel .video-frame {
+    height: 100%;
+    padding-bottom: 0 !important;
+    border-radius: 0;
+}
+
+.phone-channel .video-element,
+.laptop-channel .video-element {
+    height: 100%;
+    max-height: none;
+    object-fit: cover;
+}
+
+.phone-channel .video-info,
+.laptop-channel .video-info {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    padding: 2.75rem 1rem 1rem;
+    align-items: flex-end;
+    background: linear-gradient(to bottom, transparent, rgba(18, 16, 20, 0.85));
+    pointer-events: none;
+}
+
+.phone-channel .video-info button,
+.laptop-channel .video-info button {
+    pointer-events: auto;
+}
+
+.phone-channel .video-title,
+.laptop-channel .video-title {
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+}
+
+.phone-channel .video-desc,
+.laptop-channel .video-desc {
+    font-size: 0.78rem;
+}
+
+/* The phone's side panel already shows the title and description, so on
+   the screen itself only the admin buttons stay. */
+.phone-channel .video-info > div:first-child {
+    display: none;
+}
+
+.phone-channel .video-info {
+    justify-content: flex-end;
+}
+
+.phone-channel .video-card:not(:has(.btn-icon)) .video-info {
+    display: none;
+}
+
+/* Once the real player is loaded, the caption would sit on top of YouTube's
+   own controls — get it out of the way. */
+.phone-channel .video-card:has(.video-frame) .video-info,
+.laptop-channel .video-card:has(.video-frame) .video-info {
+    display: none;
+}
+
+/* Small uppercase format label: "Vertical · 9:16" / "Horizontal · 16:9". */
+.phone-format {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.phone-format::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    box-shadow: 0 0 10px var(--accent-color);
+}
+
+/* ============ PHONE SHOWREEL (3D) ============ */
+
+.phone-track {
+    position: relative;
+}
+
+.phone-sticky {
+    position: sticky;
+    top: max(5.5rem, 8vh);
+    height: calc(100vh - max(5.5rem, 8vh));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.phone-layout {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: clamp(2rem, 6vw, 5.5rem);
+}
+
+.phone-info {
+    justify-self: end;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.9rem;
+    text-align: right;
+}
+
+.phone-counter {
+    font-size: clamp(3rem, 6vw, 5.25rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(135deg, #fff 20%, var(--primary-color) 60%, var(--accent-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.phone-counter .section-kicker-total {
+    font-size: 0.38em;
+    -webkit-text-fill-color: var(--text-muted);
+}
+
+.phone-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: inherit;
+    gap: 0.5rem;
+}
+
+.phone-chip {
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #f1ece4;
+    background: rgba(255, 90, 31, 0.14);
+    border: 1px solid rgba(255, 90, 31, 0.35);
+}
+
+.phone-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.phone-hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.phone-dots {
+    justify-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.phone-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    transition: height 0.4s cubic-bezier(0.22, 1, 0.36, 1), background 0.4s;
+}
+
+.phone-dots span.is-active {
+    height: 26px;
+    background: linear-gradient(to bottom, var(--primary-color), var(--accent-color));
+}
+
+/* --ph is the phone's FULL (watching mode) height: the whole pinned area
+   minus a small margin, never wider than the viewport. The phone is laid out
+   at that size so the video is never upscaled, and shrunk to --ph-rest with a
+   transform while resting. The negative margins make it take up only its
+   resting size in the layout. Everything else is proportional to --ph. */
+.phone-stage {
+    --ph: min(calc(100vh - max(5.5rem, 8vh) - 24px), calc(92vw / 0.49));
+    --ph-rest: min(70vh, 700px, var(--ph));
+    --pw: calc(var(--ph) * 0.49);
+    --pr: calc(var(--pw) * 0.16);
+    position: relative;
+    width: var(--pw);
+    height: var(--ph);
+    margin-block: calc((var(--ph-rest) - var(--ph)) / 2);
+    margin-inline: calc((var(--ph-rest) - var(--ph)) * 0.49 / 2);
+    perspective: 1600px;
+}
+
+/* Invisible; exists only so JS can measure the resting size in pixels. */
+.phone-sizer {
+    position: absolute;
+    width: 0;
+    height: var(--ph-rest);
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Watching mode: the side panel and dots step aside, the page dims, and
+   the phone (see PhoneShowreel.jsx) straightens up and grows. */
+.phone-info,
+.phone-dots {
+    transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.phone-sticky.is-watching .phone-info,
+.phone-sticky.is-watching .phone-dots {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* The idle bob would make the video wobble while it's being watched. */
+.phone-sticky.is-watching .phone-float {
+    animation: none;
+}
+
+.phone-glare {
+    transition: opacity 0.6s;
+}
+
+/* No painted-on shine over a video that's actually being watched. */
+.phone-sticky.is-watching .phone-glare {
+    opacity: 0;
+}
+
+.phone-sticky.is-watching .phone-stage {
+    z-index: 2;
+}
+
+.phone-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(ellipse at center, rgba(18, 16, 20, 0.55), rgba(18, 16, 20, 0.92) 70%);
+    cursor: zoom-out;
+}
+
+.phone-close {
+    position: fixed;
+    top: 50%;
+    right: 1rem;
+    z-index: 3;
+    margin-top: -22px;
+}
+
+/* Brand-coloured backlight behind the phone. */
+.phone-stage::before {
+    content: '';
+    position: absolute;
+    inset: -18% -45%;
+    z-index: -1;
+    background:
+        radial-gradient(closest-side at 40% 45%, rgba(255, 90, 31, 0.32), transparent),
+        radial-gradient(closest-side at 62% 60%, rgba(255, 138, 80, 0.2), transparent);
+    pointer-events: none;
+}
+
+/* Positioned against the RESTING phone, which is smaller than the stage. */
+.phone-floor-shadow {
+    position: absolute;
+    left: calc(50% - var(--ph-rest) * 0.21);
+    right: calc(50% - var(--ph-rest) * 0.21);
+    bottom: calc((var(--ph) - var(--ph-rest)) / 2 - var(--ph-rest) * 0.09);
+    height: 34px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(255, 90, 31, 0.55), transparent);
+    filter: blur(6px);
+    pointer-events: none;
+}
+
+/* Idle hover-in-the-air bob. Lives on its own wrapper: .phone-rig's
+   transform belongs entirely to the scroll-linked values. */
+.phone-float {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    animation: phoneFloat 6s ease-in-out infinite;
+}
+
+@keyframes phoneFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
+}
+
+.phone-rig {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+}
+
+/* The anodised frame. Its horizontal gradient is what shows on the edges as
+   the phone turns — dark on the shadow side, a bright indigo sheen where the
+   light catches. */
+.phone-slice {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--pr);
+    background: linear-gradient(90deg, #1c1a1e 0%, #e04a12 22%, #f1ece4 46%, #ff5a1f 64%, #3a1a0c 100%);
+}
+
+.phone-btn {
+    position: absolute;
+    width: 5px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #2a2622, #ff7a3d, #7a2e10);
+}
+
+.phone-btn-action   { left: -3px;  top: 16%;   height: 4%; }
+.phone-btn-vol-up   { left: -3px;  top: 23.5%; height: 7.5%; }
+.phone-btn-vol-down { left: -3px;  top: 33%;   height: 7.5%; }
+.phone-btn-power    { right: -3px; top: 26%;   height: 11%; }
+
+.phone-front,
+.phone-back {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--pr);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* Front: black glass with a thin metallic lip around it. */
+.phone-front {
+    padding: 4%;
+    border: 3px solid transparent;
+    background:
+        linear-gradient(#121014, #121014) padding-box,
+        linear-gradient(135deg, #f1ece4, #ff5a1f 35%, #ff8a50 70%, #2a2622) border-box;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55);
+}
+
+.phone-screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: calc(var(--pr) * 0.78);
+    background: #000;
+}
+
+.phone-channel {
+    position: absolute;
+    inset: 0;
+}
+
+/* The notch — the reference phone's, not a dynamic island. */
+.phone-notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    z-index: 6;
+    width: 44%;
+    height: 3.8%;
+    transform: translateX(-50%);
+    border-radius: 0 0 16px 16px;
+    background: #121014;
+    pointer-events: none;
+}
+
+.phone-notch::after {
+    content: '';
+    position: absolute;
+    top: 30%;
+    right: 22%;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #e04a12, #121014 70%);
+}
+
+.phone-glare {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    background: linear-gradient(118deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.04) 26%, transparent 42%);
+}
+
+/* Back: glossy brand-gradient glass, camera block, a small monogram. */
+.phone-back {
+    border: 3px solid rgba(241, 236, 228, 0.5);
+    background:
+        radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.22), transparent 38%),
+        linear-gradient(160deg, #ff5a1f 0%, #f05220 38%, #e04a12 68%, #ff8a50 100%);
+}
+
+.phone-camera {
+    position: absolute;
+    top: 3.5%;
+    left: 7%;
+    width: 42%;
+    aspect-ratio: 1;
+    border-radius: 28%;
+    background: rgba(20, 18, 22, 0.45);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+        0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+.phone-camera span {
+    position: absolute;
+    width: 42%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 38%, #3a3634 0%, #121014 45%, #121014 70%);
+    box-shadow:
+        0 0 0 3px #1c1a1e,
+        0 0 0 4px rgba(241, 236, 228, 0.45);
+}
+
+.phone-camera span:nth-child(1) { top: 8%;    left: 8%; }
+.phone-camera span:nth-child(2) { bottom: 8%; right: 8%; }
+
+.phone-camera .phone-flash {
+    top: 14%;
+    right: 14%;
+    width: 16%;
+    background: radial-gradient(circle, #fef3c7, #d6a36b);
+    box-shadow: none;
+}
+
+.phone-back-mark {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: calc(var(--pw) * 0.13);
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+@media (max-width: 900px) {
+    .phone-layout {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 1.75rem;
+    }
+
+    .phone-info {
+        order: 2;
+        justify-self: center;
+        align-items: center;
+        text-align: center;
+        gap: 0.4rem;
+    }
+
+    .phone-counter {
+        font-size: 2rem;
+    }
+
+    .phone-title {
+        font-size: 1rem;
+    }
+
+    .phone-hint,
+    .phone-dots {
+        display: none;
+    }
+
+    .phone-stage {
+        --ph-rest: min(62vh, 560px, var(--ph));
+    }
+}
+
+/* ============ LAPTOP SHOWREEL (3D) ============ */
+
+/* The tall track the sticky laptop rides inside — its height is the scroll
+   budget for opening the lid and stepping through the reels. */
+.laptop-track {
+    position: relative;
+}
+
+.laptop-sticky {
+    position: sticky;
+    top: max(5.5rem, 8vh);
+    height: calc(100vh - max(5.5rem, 8vh));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* --lw is the lid's FULL (watching mode) width: the screen as tall as the
+   pinned area allows. It's laid out at that size so the video is never
+   upscaled, and shrunk to --lw-rest with a transform while resting; the
+   negative margins make it take only its resting size in the layout, plus
+   room underneath for the keyboard deck. 1.684 is the lid's aspect ratio:
+   a 16:9 screen plus its bezels (see .laptop-display's padding). */
+.laptop-stage {
+    --lw: min(86vw, 1280px, calc((100vh - max(5.5rem, 8vh) - 32px) * 1.684));
+    --lw-rest: min(64vw, 570px, calc((100vh - 24rem) * 1.684), var(--lw));
+    position: relative;
+    width: var(--lw);
+    aspect-ratio: 1.684;
+    margin-inline: calc((var(--lw-rest) - var(--lw)) / 2);
+    margin-top: calc((var(--lw-rest) - var(--lw)) / 1.684 / 2);
+    margin-bottom: calc((var(--lw-rest) - var(--lw)) / 1.684 / 2 + var(--lw-rest) * 0.18);
+    perspective: 2600px;
+}
+
+/* Soft brand glow on the "desk" under the resting laptop. */
+.laptop-stage::after {
+    content: '';
+    position: absolute;
+    left: calc(50% - var(--lw-rest) * 0.55);
+    right: calc(50% - var(--lw-rest) * 0.55);
+    top: calc(50% + var(--lw-rest) * 0.2);
+    height: calc(var(--lw-rest) * 0.3);
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(255, 90, 31, 0.35), rgba(255, 138, 80, 0.1) 60%, transparent);
+    pointer-events: none;
+}
+
+.laptop-sizer {
+    position: absolute;
+    width: var(--lw-rest);
+    height: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* rig: scale around the screen's centre. pivot + lid: rotate around the
+   hinge (bottom edge). Split so each element has one transform driver. */
+.laptop-rig,
+.laptop-pivot,
+.laptop-lid {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+}
+
+/* The containers are invisible boxes, but in 3D the lid leans BEHIND their
+   plane, so they'd sit in front of the screen and swallow every click. Only
+   the screen itself takes pointer events. */
+.laptop-rig,
+.laptop-pivot,
+.laptop-lid,
+.laptop-base {
+    pointer-events: none;
+}
+
+.laptop-display {
+    pointer-events: auto;
+}
+
+.laptop-rig {
+    transform-origin: 50% 50%;
+}
+
+.laptop-pivot,
+.laptop-lid {
+    transform-origin: 50% 100%;
+}
+
+/* ---- Lid ---- */
+
+.laptop-lid-slice,
+.laptop-lid-back,
+.laptop-display {
+    position: absolute;
+    inset: 0;
+    border-radius: 2.4% / 4%;
+}
+
+/* The lid's aluminium edge, seen as it opens and turns. */
+.laptop-lid-slice {
+    background: linear-gradient(90deg, #222024, #46423f 45%, #2a2729);
+}
+
+.laptop-lid-back {
+    display: grid;
+    place-items: center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background:
+        radial-gradient(circle at 30% 20%, rgba(241, 236, 228, 0.14), transparent 50%),
+        linear-gradient(160deg, #2b282b, #18161a 60%, #100f12);
+    box-shadow: inset 0 0 0 1px rgba(241, 236, 228, 0.2);
+}
+
+.laptop-lid-back span {
+    font-size: calc(var(--lw) * 0.05);
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    background: linear-gradient(135deg, #f1ece4, var(--primary-color), var(--accent-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 12px rgba(255, 138, 80, 0.45));
+}
+
+/* The front of the lid: thin black bezels around an exact 16:9 screen.
+   Padding percentages are of the WIDTH, which is what makes the maths
+   work: 0.956 × 9/16 = 0.5378 screen + 0.056 bezel = 0.5938 = 1 / 1.684. */
+.laptop-display {
+    padding: 2.4% 2.2% 3.2%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background: #0a090b;
+    box-shadow:
+        inset 0 0 0 1.5px rgba(241, 236, 228, 0.28),
+        0 40px 90px rgba(0, 0, 0, 0.5);
+}
+
+.laptop-camera {
+    position: absolute;
+    top: 1.6%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #e04a12, #121014 70%);
+}
+
+.laptop-screen {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #000;
+}
+
+/* Fades in as the lid opens — the screen "wakes up". */
+.laptop-power,
+.laptop-channel {
+    position: absolute;
+    inset: 0;
+}
+
+/* ---- Base ---- */
+
+/* Hangs off the hinge line and is folded flat (rotateX 90°) so it reaches
+   toward the viewer like a real keyboard deck. Its local +z is "up". */
+.laptop-base {
+    position: absolute;
+    top: 100%;
+    left: -1.5%;
+    width: 103%;
+    height: calc(var(--lw) * 0.62);
+    transform-origin: 50% 0;
+    transform: rotateX(90deg);
+    transform-style: preserve-3d;
+}
+
+.laptop-base-slice,
+.laptop-base-bottom,
+.laptop-deck {
+    position: absolute;
+    inset: 0;
+    border-radius: calc(var(--lw) * 0.012) calc(var(--lw) * 0.012) calc(var(--lw) * 0.035) calc(var(--lw) * 0.035);
+}
+
+.laptop-base-slice {
+    background: linear-gradient(90deg, #1c1a1e, #3a3739 50%, #211f23);
+}
+
+.laptop-base-bottom {
+    background: #121014;
+}
+
+/* Top of the deck: keyboard + trackpad, with a pink accent line along the
+   front edge. */
+.laptop-deck {
+    display: flex;
+    flex-direction: column;
+    padding: 5% 7% 4%;
+    gap: 7%;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(255, 90, 31, 0.12), transparent 60%),
+        linear-gradient(180deg, #2c2a2d, #242226);
+    box-shadow:
+        inset 0 -2px 0 rgba(255, 138, 80, 0.55),
+        inset 0 0 0 1px rgba(241, 236, 228, 0.12);
+}
+
+.laptop-keyboard {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--lw) * 0.006);
+    padding: calc(var(--lw) * 0.008);
+    border-radius: 6px;
+    background: rgba(12, 11, 14, 0.55);
+}
+
+.laptop-key-row {
+    display: flex;
+    gap: calc(var(--lw) * 0.006);
+    height: calc(var(--lw) * 0.04);
+}
+
+/* Backlit keys: a faint indigo glow leaking out around each one. */
+.laptop-key-row span {
+    flex-basis: 0;
+    border-radius: 3px;
+    background: linear-gradient(180deg, #151417, #0c0b0e);
+    box-shadow:
+        0 0 calc(var(--lw) * 0.007) rgba(255, 90, 31, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.laptop-trackpad {
+    width: 38%;
+    aspect-ratio: 1.6;
+    margin: 0 auto;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #363335, #2b292c);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* ---- Footer + watching mode ---- */
+
+/* Pinned to the bottom of the pinned area so the keyboard deck, which
+   hangs below the stage box in 3D, can never cover it. */
+.laptop-footer {
+    position: absolute;
+    bottom: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.laptop-counter {
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.laptop-hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.laptop-sticky.is-watching .laptop-footer {
+    opacity: 0;
+}
+
+.laptop-sticky.is-watching .laptop-stage {
+    z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .phone-float {
+        animation: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .laptop-stage {
+        --lw-rest: min(70vw, calc((100vh - 24rem) * 1.684), var(--lw));
+    }
+
+    .laptop-footer {
+        gap: 0.75rem;
+    }
+
+    .laptop-hint {
+        display: none;
+    }
+
+    .laptop-channel .video-info {
+        display: none;
+    }
+}
+
+
+/* ============ SCROLL CHOREOGRAPHY ============
+   Built around the brand's one idea, the cut: a playhead that scrubs the
+   hero name in, chapter titles sliced like the logo, a timeline under the
+   Craft cards, and a contact reveal that cuts the title open. */
+
+/* ---- Hero name: playhead scrub (PlayheadReveal.jsx) ---- */
+.playhead-reveal {
+    position: relative;
+    display: inline-block;
+}
+
+.playhead-reveal-text {
+    display: block;
+}
+
+.playhead-reveal-head {
+    position: absolute;
+    top: -4%;
+    bottom: -4%;
+    width: 2px;
+    margin-left: -1px;
+    background: var(--brand-orange);
+    box-shadow: 0 0 12px rgba(255, 90, 31, 0.8);
+    pointer-events: none;
+}
+
+/* The little flag on top, like a timeline playhead. */
+.playhead-reveal-head::before {
+    content: '';
+    position: absolute;
+    top: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 10px solid var(--brand-orange);
+}
+
+/* ---- Hero portrait: focus brackets + REC light ---- */
+.hero-photo-bracket-tr {
+    top: -0.6rem;
+    right: -0.6rem;
+    border-top: 2px solid rgba(255, 255, 255, 0.45);
+    border-right: 2px solid rgba(255, 255, 255, 0.45);
+}
+
+.hero-photo-bracket-bl {
+    bottom: 4.5rem;
+    left: -0.6rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.45);
+    border-left: 2px solid rgba(255, 255, 255, 0.45);
+}
+
+.hero-rec {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.9rem;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    color: var(--text-main);
+}
+
+.hero-rec i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--brand-orange);
+    box-shadow: 0 0 8px var(--brand-orange);
+    animation: recBlink 1.2s ease-in-out infinite;
+}
+
+@keyframes recBlink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.15; }
+}
+
+/* ---- Sliced display text (SliceText.jsx) ----
+   Two copies of the text, each clipped to one side of the same rising
+   diagonal as the logo's cut. */
+.slice-text {
+    position: relative;
+    display: inline-block;
+}
+
+.slice-half {
+    display: block;
+}
+
+.slice-half-top {
+    clip-path: polygon(0 0, 100% 0, 100% 43%, 0 61%);
+}
+
+.slice-half-bottom {
+    position: absolute;
+    inset: 0;
+    clip-path: polygon(0 61%, 100% 43%, 100% 100%, 0 100%);
+    color: #d6cec3;
+}
+
+.slice-slit {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    filter: drop-shadow(0 0 6px rgba(255, 90, 31, 0.9));
+}
+
+.slice-slit line {
+    stroke: var(--brand-orange);
+    stroke-width: 3;
+    stroke-linecap: round;
+}
+
+/* ---- Chapter titles (BigTitle.jsx) ----
+   The track pins the title for a stretch of scroll; the negative bottom
+   margin lets the next section rise over it. A negative z-index (inside
+   main's stacking context) keeps it under every section without giving
+   those sections stacking contexts of their own, which would trap the
+   showreel's fixed watching-mode overlay. */
+.big-title-track {
+    position: relative;
+    z-index: -1;
+    height: 170vh;
+    margin-bottom: -70vh;
+    pointer-events: none;
+}
+
+.big-title-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.big-title {
+    font-size: clamp(3.4rem, 15vw, 13.5rem);
+    font-weight: 900;
+    line-height: 0.9;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--brand-cream);
+    will-change: opacity;
+}
+
+.big-title-kicker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-bottom: 1.4rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* Slate-style scene number. */
+.big-title-scene {
+    padding: 0.2rem 0.45rem;
+    border: 1px solid rgba(255, 90, 31, 0.5);
+    border-radius: 4px;
+    letter-spacing: 0.14em;
+    font-variant-numeric: tabular-nums;
+    color: var(--primary-color);
+}
+
+.big-title-static {
+    padding: 6rem 1rem 2rem;
+    text-align: center;
+    overflow: hidden;
+}
+
+/* ---- Scroll-lit words (ScrollWords.jsx) ---- */
+.scroll-word {
+    display: inline-block;
+    white-space: pre;
+}
+
+/* Key words get an orange underline drawn under them, like a selected clip. */
+.scroll-word-accent {
+    font-weight: 600;
+    color: var(--text-main);
+    padding-bottom: 2px;
+    background-image: linear-gradient(var(--brand-orange), var(--brand-orange));
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 2px;
+}
+
+/* ---- Craft: pinned stepper with an editing timeline ---- */
+.craft-track {
+    position: relative;
+}
+
+.craft-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 4.5rem;
+}
+
+.craft-head {
+    margin-bottom: 0.5rem;
+}
+
+.craft-sticky .craft-stage-wrap {
+    padding: 2rem 1rem 1.25rem;
+}
+
+.craft-sticky .craft-stage {
+    height: 320px;
+}
+
+.craft-sticky .craft-controls {
+    margin-top: 0.75rem;
+}
+
+.craft-timeline {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: 660px;
+    margin: 0.25rem auto 0;
+}
+
+.craft-timeline-track {
+    position: relative;
+    flex: 1;
+    display: flex;
+    gap: 3px;
+    padding: 8px 0;
+}
+
+.craft-clip {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 6px;
+    overflow: hidden;
+    border-radius: 4px;
+    background: rgba(241, 236, 228, 0.05);
+    border: 1px solid rgba(241, 236, 228, 0.1);
+    transition: background-color 0.35s ease, border-color 0.35s ease;
+}
+
+.craft-clip em {
+    font-style: normal;
+    font-size: 0.58rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: rgba(241, 236, 228, 0.45);
+    transition: color 0.35s ease;
+}
+
+.craft-clip.is-done {
+    background: rgba(255, 90, 31, 0.14);
+    border-color: rgba(255, 90, 31, 0.25);
+}
+
+.craft-clip.is-active {
+    background: linear-gradient(135deg, rgba(255, 90, 31, 0.9), rgba(255, 138, 80, 0.75));
+    border-color: rgba(255, 138, 80, 0.9);
+}
+
+.craft-clip.is-active em {
+    color: var(--brand-black);
+}
+
+.craft-playhead {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    margin-left: -1px;
+    background: var(--brand-cream);
+    box-shadow: 0 0 8px rgba(241, 236, 228, 0.6);
+    pointer-events: none;
+}
+
+.craft-playhead::before {
+    content: '';
+    position: absolute;
+    top: -7px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid var(--brand-cream);
+}
+
+.craft-timecode {
+    min-width: 6.4rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+}
+
+@media (max-width: 640px) {
+    .craft-clip em {
+        display: none;
+    }
+
+    .craft-timeline {
+        gap: 0.6rem;
+        padding: 0 0.25rem;
+    }
+
+    .craft-timecode {
+        min-width: 5.4rem;
+        font-size: 0.62rem;
+    }
+}
+
+@media (max-height: 780px) {
+    .craft-sticky .craft-stage {
+        height: 290px;
+    }
+
+    .craft-head p {
+        display: none;
+    }
+}
+
+/* ---- Contact: make the cut ---- */
+.cut-track {
+    position: relative;
+    height: 300vh;
+}
+
+.cut-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.cut-title {
+    position: absolute;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+}
+
+.cut-title-box {
+    position: relative;
+    display: inline-block;
+}
+
+/* Scissors riding the blade as the cut is drawn. */
+.cut-razor {
+    position: absolute;
+    display: flex;
+    transform: translate(-50%, -50%);
+    color: var(--brand-orange);
+    filter: drop-shadow(0 0 8px rgba(255, 90, 31, 0.9));
+}
+
+.cut-hint {
+    margin-top: 2.25rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    animation: hintPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes hintPulse {
+    0%, 100% { opacity: 0.35; transform: translateY(0); }
+    50%      { opacity: 1;    transform: translateY(4px); }
+}
+
+.cut-content {
+    position: relative;
+    z-index: 4;
+    width: 100%;
+    will-change: transform;
+}
+
+.cut-card-wrap {
+    position: relative;
+}
+
+.cut-card {
+    will-change: clip-path, opacity;
+}
+
+/* Viewfinder corners that snap onto the card once it is open. */
+.cut-corner {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border: 0 solid var(--brand-orange);
+    pointer-events: none;
+}
+
+.cut-corner-tl { top: -14px;    left: -14px;  border-top-width: 2px;    border-left-width: 2px; }
+.cut-corner-tr { top: -14px;    right: -14px; border-top-width: 2px;    border-right-width: 2px; }
+.cut-corner-bl { bottom: -14px; left: -14px;  border-bottom-width: 2px; border-left-width: 2px; }
+.cut-corner-br { bottom: -14px; right: -14px; border-bottom-width: 2px; border-right-width: 2px; }
+
+.cut-export {
+    position: absolute;
+    bottom: 2.25rem;
+    left: 50%;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    width: min(420px, 80vw);
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.cut-export-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+}
+
+.cut-export-track {
+    display: block;
+    height: 2px;
+    overflow: hidden;
+    border-radius: 2px;
+    background: rgba(241, 236, 228, 0.12);
+}
+
+.cut-export-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-hover), var(--accent-color));
+    box-shadow: 0 0 10px rgba(255, 90, 31, 0.6);
+}
+
+@media (max-width: 640px) {
+    .cut-corner-tl, .cut-corner-tr { top: -10px; }
+    .cut-corner-bl, .cut-corner-br { bottom: -10px; }
+    .cut-corner-tl, .cut-corner-bl { left: -8px; }
+    .cut-corner-tr, .cut-corner-br { right: -8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cut-hint,
+    .hero-rec i { animation: none; }
+}
+
+
+/* Bouncing arrow on "See my work" (compositor-only). */
+.hero-cta-arrow {
+    display: flex;
+    animation: arrowBob 1.8s ease-in-out infinite;
+}
+
+@keyframes arrowBob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-cta-arrow { animation: none; }
+}
+
+/* ============ RENDERING HINTS ============
+   Let the browser skip style, layout and paint for these tall scroll stages
+   while they are off-screen. Each has an explicit height (or remembers its
+   last rendered size), so skipping never changes the page length or the
+   scroll positions the animations are timed against.
+   The showreel is deliberately left out: its watching mode uses a fixed
+   overlay, and containment would pin that overlay to the section instead
+   of the viewport. */
+.hero,
+.big-title-track,
+.craft-track,
+.cut-track {
+    content-visibility: auto;
+}
+
+.hero {
+    contain-intrinsic-size: auto 100vh;
+}
+
+/* The always-on backdrop never affects layout; isolate it completely. */
+.site-bg {
+    contain: strict;
+}
